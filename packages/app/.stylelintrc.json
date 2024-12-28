@@ -1,0 +1,16 @@
+{
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-recommended-vue",
+    "stylelint-config-property-sort-order-smacss"
+  ],
+  "rules": {
+    "media-feature-name-allowed-list": ["width", "prefers-color-scheme"],
+    "property-no-vendor-prefix": [
+      true,
+      {
+        "ignoreProperties": ["font-smoothing", "user-select"]
+      }
+    ]
+  }
+}
