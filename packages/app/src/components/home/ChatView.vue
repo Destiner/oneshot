@@ -36,10 +36,13 @@ import { ref } from 'vue';
 import IconHammer from '@/components/__common/IconHammer.vue';
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
 import ApiService from '@/services/api';
+import useEnv from '@/composables/useEnv';
 
 import ChatMessages, { type Message } from './ChatMessages.vue';
 
-const api = new ApiService('http://localhost:3000');
+const { apiBaseUrl } = useEnv();
+
+const api = new ApiService(apiBaseUrl);
 
 const prompt = ref('');
 const messages = ref<Message[]>([]);

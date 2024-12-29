@@ -6,6 +6,8 @@ import llm, {
   type Route as LlmRoute,
 } from './llm/index.js';
 
+const port = process.env.PORT ?? 3000;
+
 const app = new Hono();
 
 app.use(cors());
@@ -16,7 +18,11 @@ const route = app
   })
   .route('/llm', llm as LlmRoute);
 
+export default {
+  port: Number(port),
+  fetch: app.fetch,
+};
+
 type App = typeof route;
 
-export default app;
 export type { AnthropicStreamEvent, App };
