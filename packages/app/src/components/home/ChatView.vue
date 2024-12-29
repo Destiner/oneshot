@@ -144,6 +144,7 @@ form {
 }
 
 input {
+  width: 100%;
   padding: 8px;
   border: none;
   outline: none;

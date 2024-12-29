@@ -84,10 +84,12 @@ export type { Model, Message };
 .content {
   display: flex;
   flex-direction: column;
+  max-width: 80ch;
   gap: 4px;
 }
 
 .text {
+  white-space: pre-wrap;
   -webkit-user-select: initial;
   user-select: initial;
 }
