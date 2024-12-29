@@ -5,6 +5,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.33.1",
+    "@modelcontextprotocol/sdk": "^1.0.4",
     "@smithery/sdk": "^0.0.15",
     "hono": "^4.6.15"
   },
