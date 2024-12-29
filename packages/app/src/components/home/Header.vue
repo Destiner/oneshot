@@ -46,6 +46,7 @@ function handleSidebarIconClick() {
   --height: 32px;
 
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   background: #3b3c3c;
 }
@@ -90,5 +91,6 @@ function handleSidebarIconClick() {
 .title {
   padding: 8px;
   font-weight: bold;
+  cursor: default;
 }
 </style>

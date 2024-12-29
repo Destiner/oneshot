@@ -14,8 +14,8 @@
       {
         "title": "Oneshot",
         "hiddenTitle": true,
-        "width": 1400,
-        "height": 750,
+        "width": 1200,
+        "height": 700,
         "minWidth": 768,
         "minHeight": 500,
         "resizable": true,

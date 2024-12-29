@@ -29,5 +29,6 @@ function handleToggleSidebar() {
 .content {
   display: flex;
   flex: 1;
+  min-height: 0;
 }
 </style>
