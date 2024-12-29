@@ -20,10 +20,26 @@
       </form>
       <div class="toolbar">
         <div class="side">
-          <div class="button">
-            <IconHammer class="icon" />
-            Tools
-          </div>
+          <SelectTool
+            :tools
+            v-model="selectedTool"
+          >
+            <template #trigger>
+              <div class="button">
+                <template v-if="selectedTool === null">
+                  <IconHammer class="icon" />
+                  Tools
+                </template>
+                <template v-else>
+                  <img
+                    :src="selectedTool.iconUrl"
+                    class="icon"
+                  />
+                  {{ selectedTool.name }}
+                </template>
+              </div>
+            </template>
+          </SelectTool>
         </div>
       </div>
     </div>
@@ -31,21 +47,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref, onMounted } from 'vue';
 
 import IconHammer from '@/components/__common/IconHammer.vue';
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
-import ApiService from '@/services/api';
+import ApiService, { type Tool } from '@/services/api';
 import useEnv from '@/composables/useEnv';
+import useToolsStore from '@/stores/tools';
 
 import ChatMessages, { type Message } from './ChatMessages.vue';
+import SelectTool from './SelectTool.vue';
 
 const { apiBaseUrl } = useEnv();
+const toolsStore = useToolsStore();
 
 const api = new ApiService(apiBaseUrl);
 
 const prompt = ref('');
 const messages = ref<Message[]>([]);
+const selectedTool = ref<Tool | null>(null);
+const tools = computed(() => toolsStore.tools);
+
+onMounted(async () => {
+  const newTools = await api.getTools();
+  toolsStore.setTools(newTools);
+});
 
 async function send() {
   messages.value.push({
@@ -54,39 +80,57 @@ async function send() {
   });
   prompt.value = '';
 
-  await api.streamLlmChatResponse('sonnet-3.5', messages.value, (event) => {
-    if (event.type === 'message_start') {
-      messages.value.push({
-        role: event.message.role,
-        content: event.message.content,
-      });
-    } else if (event.type === 'content_block_start') {
-      const newContentBlock = event.content_block;
-      if (newContentBlock.type === 'tool_use') {
-        newContentBlock.input = '';
-        // Set the new tool call to be visible by default
-        const messageIndex = messages.value.length - 1;
-        const blockIndex = messages.value[messageIndex].content.length;
-        showToolCallDetails.value[`${messageIndex}-${blockIndex}`] = true;
-      }
-      messages.value[messages.value.length - 1].content.push(newContentBlock);
-    } else if (event.type === 'content_block_delta') {
-      const latestMessage = messages.value[messages.value.length - 1];
-      const latestContentBlock =
-        latestMessage.content[latestMessage.content.length - 1];
-      if (latestContentBlock.type === 'text') {
-        const delta =
-          event.delta.type === 'text_delta'
-            ? event.delta.text
-            : event.delta.partial_json;
-        latestContentBlock.text += delta;
-      } else if (latestContentBlock.type === 'tool_use') {
-        if (event.delta.type === 'input_json_delta') {
-          latestContentBlock.input += event.delta.partial_json;
+  const tools = selectedTool.value ? [selectedTool.value.id] : [];
+
+  await api.streamLlmChatResponse(
+    'sonnet-3.5',
+    messages.value,
+    tools,
+    (event) => {
+      if (event.type === 'message_start') {
+        console.log(event.message);
+        messages.value.push({
+          role: event.message.role,
+          content: event.message.content,
+        });
+      } else if (event.type === 'content_block_start') {
+        const newContentBlock = event.content_block;
+        if (newContentBlock.type === 'tool_use') {
+          newContentBlock.type = 'tool';
+          newContentBlock.tool = getToolId(newContentBlock.name);
+          newContentBlock.input = '';
+        }
+        messages.value[messages.value.length - 1].content.push(newContentBlock);
+      } else if (event.type === 'content_block_delta') {
+        const latestMessage = messages.value[messages.value.length - 1];
+        const latestContentBlock =
+          latestMessage.content[latestMessage.content.length - 1];
+        if (latestContentBlock.type === 'text') {
+          const delta =
+            event.delta.type === 'text_delta'
+              ? event.delta.text
+              : event.delta.partial_json;
+          latestContentBlock.text += delta;
+        } else if (latestContentBlock.type === 'tool') {
+          if (event.delta.type === 'input_json_delta') {
+            latestContentBlock.input += event.delta.partial_json;
+          }
+        }
+      } else if (event.type === 'tool_result') {
+        const latestMessage = messages.value[messages.value.length - 1];
+        const latestContentBlock =
+          latestMessage.content[latestMessage.content.length - 1];
+        if (latestContentBlock.type === 'tool') {
+          latestContentBlock.output = event.result;
         }
       }
-    }
-  });
+    },
+  );
+}
+
+function getToolId(name: string) {
+  const toolId = name.split('_')[0];
+  return toolId;
 }
 </script>
 

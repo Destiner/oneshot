@@ -14,23 +14,27 @@
         class="tool-call"
         v-else-if="part.type === 'tool'"
       >
-        <div class="tool-header">
-          <div class="tool-icon" />
-          {{ part.tool.action }}
-        </div>
-        <div class="tool-content">
-          <div class="tool-input">
-            <div>→</div>
-            <div>{{ part.input }}</div>
+        <details>
+          <summary>
+            <ToolHeader :id="part.tool" />
+          </summary>
+          <div class="tool-content">
+            <div
+              class="tool-input"
+              v-if="part.input"
+            >
+              <div>→</div>
+              <div>{{ part.input }}</div>
+            </div>
+            <div
+              class="tool-output"
+              v-if="part.output"
+            >
+              <div>←</div>
+              <div>{{ part.output }}</div>
+            </div>
           </div>
-          <div
-            class="tool-output"
-            v-if="part.output"
-          >
-            <div>←</div>
-            <div>{{ part.output }}</div>
-          </div>
-        </div>
+        </details>
       </div>
     </div>
   </div>
@@ -43,14 +47,12 @@ defineProps<{
 </script>
 
 <script lang="ts">
+import { type ToolId } from '@/services/api';
+
+import ToolHeader from './ToolHeader.vue';
+
 type Message = UserMessage | AssistantMessage;
 type Model = 'sonnet-3.5';
-type ToolIcon = 'exa' | 'linear' | 'e2b' | 'files' | 'sequence';
-
-interface Tool {
-  icon: ToolIcon;
-  action: string;
-}
 
 interface TextContent {
   type: 'text';
@@ -59,7 +61,7 @@ interface TextContent {
 
 interface ToolContent {
   type: 'tool';
-  tool: Tool;
+  tool: ToolId;
   input: string;
   output?: string;
 }
@@ -85,7 +87,7 @@ export type { Model, Message };
   display: flex;
   flex-direction: column;
   max-width: 80ch;
-  gap: 4px;
+  gap: 8px;
 }
 
 .text {
@@ -99,27 +101,21 @@ export type { Model, Message };
   flex-direction: column;
   border-radius: 4px;
   background: #2d2f2f;
-}
 
-.tool-header {
-  display: flex;
-  align-items: center;
-  padding: 8px;
-  border-bottom: 1px solid #3d3f3f;
-  font-size: 16px;
-  gap: 8px;
-}
+  summary {
+    list-style: none;
 
-.tool-icon {
-  width: 20px;
-  height: 20px;
-  background: #8f8f8f;
+    &::-webkit-details-marker {
+      display: none;
+    }
+  }
 }
 
 .tool-content {
   display: flex;
   flex-direction: column;
   padding: 8px;
+  border-top: 1px solid #3d3f3f;
   font-family: 'SF Mono', monospace;
   gap: 8px;
 }
@@ -128,5 +124,12 @@ export type { Model, Message };
 .tool-output {
   display: flex;
   gap: 8px;
+}
+
+.tool-output {
+  max-height: 250px;
+  overflow-y: auto;
+  word-break: break-word;
+  white-space: pre-wrap;
 }
 </style>

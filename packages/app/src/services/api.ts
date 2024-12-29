@@ -4,6 +4,26 @@ import type Anthropic from '@anthropic-ai/sdk';
 
 type StreamEvent = Anthropic.Messages.RawMessageStreamEvent;
 
+const TOOL_EXA = 'exa';
+const TOOL_SEQUENTIAL_THINKING = 'sequentialThinking';
+const TOOL_FILE_SYSTEM = 'fileSystem';
+const TOOL_LINEAR = 'linear';
+const TOOL_E2B = 'e2b';
+
+type ToolId =
+  | typeof TOOL_EXA
+  | typeof TOOL_SEQUENTIAL_THINKING
+  | typeof TOOL_FILE_SYSTEM
+  | typeof TOOL_LINEAR
+  | typeof TOOL_E2B;
+
+interface Tool {
+  id: ToolId;
+  name: string;
+  iconUrl: string;
+  actionDescription: string;
+}
+
 class ApiService {
   client: KyInstance;
 
@@ -16,13 +36,14 @@ class ApiService {
   async streamLlmChatResponse(
     model: 'sonnet-3.5',
     messages: { role: string; content: string }[],
+    tools: ToolId[],
     onEvent: (event: StreamEvent) => void,
   ) {
     const response = await this.client.post('llm/chat', {
       searchParams: {
         model,
       },
-      json: { messages },
+      json: { messages, tools },
     });
 
     const body = response.body;
@@ -52,6 +73,12 @@ class ApiService {
       }
     }
   }
+
+  async getTools() {
+    const response = await this.client.get('llm/tools');
+    return response.json<Tool[]>();
+  }
 }
 
 export default ApiService;
+export type { Tool, ToolId };

@@ -89,7 +89,7 @@ export type { Message };
   flex-direction: column;
   padding: 16px;
   overflow-y: scroll;
-  gap: 8px;
+  gap: 24px;
 }
 
 .message-group {
@@ -116,7 +116,7 @@ export type { Message };
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 8px;
+  gap: 16px;
   padding-top: 4px;
 }
 </style>
