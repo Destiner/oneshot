@@ -1,9 +1,10 @@
 {
-  "name": "server",
+  "name": "@oneshot/server",
   "scripts": {
     "dev": "bun run --hot src/index.ts"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^0.33.1",
     "hono": "^4.6.15"
   },
   "devDependencies": {

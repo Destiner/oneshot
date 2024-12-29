@@ -35,72 +35,55 @@ import { ref } from 'vue';
 
 import IconHammer from '@/components/__common/IconHammer.vue';
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
+import ApiService from '@/services/api';
 
 import ChatMessages, { type Message } from './ChatMessages.vue';
 
-const prompt = ref('');
-const messages = ref<Message[]>([
-  {
-    role: 'user',
-    content: [
-      { type: 'text', content: 'Could you please look up snow leopard facts?' },
-    ],
-  },
-  {
-    role: 'assistant',
-    model: 'sonnet-3.5',
-    content: [
-      {
-        type: 'text',
-        content: 'Let me look up the facts for you.',
-      },
-    ],
-  },
-  {
-    role: 'assistant',
-    model: 'sonnet-3.5',
-    content: [
-      {
-        type: 'tool',
-        tool: {
-          icon: 'exa',
-          action: 'Searching with Exa',
-        },
-        input: 'snow leopard facts',
-        output:
-          '{"results": [{"title": "Snow Leopard Facts", "url": "https://www.snowleopardfacts.com"}, {"title": "Snow Leopard", "url": "https://wikipedia.org/wiki/Snow_leopard"}]}',
-      },
-      {
-        type: 'tool',
-        tool: {
-          icon: 'exa',
-          action: 'Searching with Exa',
-        },
-        input: 'snow leopard geography',
-        output:
-          '{"results": [{"title": "Snow Leopard Geography", "url": "https://www.snowleopardgeography.com"}, {"title": "Snow Leopard", "url": "https://wikipedia.org/wiki/Snow_leopard"}]}',
-      },
-    ],
-  },
-  {
-    role: 'assistant',
-    model: 'sonnet-3.5',
-    content: [
-      {
-        type: 'text',
-        content:
-          'Based on the results, here are some facts about snow leopards: Snow leopards are a species of cat that are found in the mountains of Central and South Asia. They are known for their distinctive spotted coat and are considered a symbol of strength and beauty.',
-      },
-    ],
-  },
-]);
+const api = new ApiService('http://localhost:3000');
 
-function send() {
+const prompt = ref('');
+const messages = ref<Message[]>([]);
+
+async function send() {
   messages.value.push({
     role: 'user',
-    content: [{ type: 'text', content: prompt.value }],
+    content: [{ type: 'text', text: prompt.value }],
   });
   prompt.value = '';
+
+  await api.streamLlmChatResponse('sonnet-3.5', messages.value, (event) => {
+    if (event.type === 'message_start') {
+      messages.value.push({
+        role: event.message.role,
+        content: event.message.content,
+      });
+    } else if (event.type === 'content_block_start') {
+      const newContentBlock = event.content_block;
+      if (newContentBlock.type === 'tool_use') {
+        newContentBlock.input = '';
+        // Set the new tool call to be visible by default
+        const messageIndex = messages.value.length - 1;
+        const blockIndex = messages.value[messageIndex].content.length;
+        showToolCallDetails.value[`${messageIndex}-${blockIndex}`] = true;
+      }
+      messages.value[messages.value.length - 1].content.push(newContentBlock);
+    } else if (event.type === 'content_block_delta') {
+      const latestMessage = messages.value[messages.value.length - 1];
+      const latestContentBlock =
+        latestMessage.content[latestMessage.content.length - 1];
+      if (latestContentBlock.type === 'text') {
+        const delta =
+          event.delta.type === 'text_delta'
+            ? event.delta.text
+            : event.delta.partial_json;
+        latestContentBlock.text += delta;
+      } else if (latestContentBlock.type === 'tool_use') {
+        if (event.delta.type === 'input_json_delta') {
+          latestContentBlock.input += event.delta.partial_json;
+        }
+      }
+    }
+  });
 }
 </script>
 

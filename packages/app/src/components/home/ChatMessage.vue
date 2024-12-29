@@ -8,7 +8,7 @@
         v-if="part.type === 'text'"
         class="text"
       >
-        {{ part.content }}
+        {{ part.text }}
       </div>
       <div
         class="tool-call"
@@ -54,7 +54,7 @@ interface Tool {
 
 interface TextContent {
   type: 'text';
-  content: string;
+  text: string;
 }
 
 interface ToolContent {

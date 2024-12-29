@@ -5,7 +5,16 @@
       :key="group.id"
       class="message-group"
     >
-      <div class="group-icon" />
+      <div class="group-icon">
+        <IconPerson
+          v-if="group[0].role === 'user'"
+          class="icon"
+        />
+        <IconClaude
+          v-else
+          class="icon"
+        />
+      </div>
       <div class="group-messages">
         <ChatMessage
           v-for="message in group"
@@ -19,6 +28,9 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+
+import IconClaude from '@/components/__common/IconClaude.vue';
+import IconPerson from '@/components/__common/IconPerson.vue';
 
 import ChatMessage from './ChatMessage.vue';
 
@@ -57,7 +69,9 @@ const groupedMessages = computed<Message[][]>(() => {
       latestGroup = [message];
     }
   }
-  groups.push(latestGroup);
+  if (latestGroup.length > 0) {
+    groups.push(latestGroup);
+  }
 
   return groups;
 });
@@ -84,11 +98,18 @@ export type { Message };
 }
 
 .group-icon {
+  display: flex;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
   width: 36px;
   height: 36px;
   border-radius: 50%;
-  background: #8f8f8f;
+
+  .icon {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .group-messages {
