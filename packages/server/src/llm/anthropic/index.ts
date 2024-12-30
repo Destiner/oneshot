@@ -90,7 +90,7 @@ async function init() {
 }
 
 async function streamResponse(
-  messages: { role: string; content: string }[],
+  messages: Anthropic.MessageParam[],
   tools: ToolId[],
   onEvent: (event: StreamEvent) => Promise<void>,
 ) {

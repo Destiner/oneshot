@@ -19,7 +19,7 @@
               v-for="(tool, index) in tools"
               :key="index"
               class="item"
-              :value="tool"
+              :value="tool.id"
             >
               <img
                 :src="tool.iconUrl"
@@ -37,12 +37,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
 import { Select } from 'radix-vue/namespaced';
 
-import type { Tool } from '@/services/api';
+import type { Tool, ToolId } from '@/services/api';
 
-const selected = defineModel<Tool | null>({
+const selected = defineModel<ToolId | undefined>({
   required: true,
 });
 
@@ -50,8 +49,8 @@ defineProps<{
   tools: Tool[];
 }>();
 
-function handleModelValueUpdate(value: Tool | null) {
-  selected.value = value;
+function handleModelValueUpdate(value: string) {
+  selected.value = value as ToolId;
 }
 </script>
 

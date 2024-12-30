@@ -2,7 +2,13 @@ import ky, { type KyInstance } from 'ky';
 
 import type Anthropic from '@anthropic-ai/sdk';
 
-type StreamEvent = Anthropic.Messages.RawMessageStreamEvent;
+type StreamEvent =
+  | Anthropic.Messages.RawMessageStreamEvent
+  | {
+      type: 'tool_result';
+      toolUseId: string;
+      result: string;
+    };
 
 const TOOL_EXA = 'exa';
 const TOOL_SEQUENTIAL_THINKING = 'sequentialThinking';
@@ -35,7 +41,7 @@ class ApiService {
 
   async streamLlmChatResponse(
     model: 'sonnet-3.5',
-    messages: { role: string; content: string }[],
+    messages: Anthropic.MessageParam[],
     tools: ToolId[],
     onEvent: (event: StreamEvent) => void,
   ) {

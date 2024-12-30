@@ -79,7 +79,7 @@ interface AssistantMessage {
   content: MessageContent[];
 }
 
-export type { Model, Message };
+export type { Model, Message, TextContent, ToolContent };
 </script>
 
 <style scoped>

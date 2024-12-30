@@ -1,13 +1,13 @@
 <template>
   <div class="messages">
     <div
-      v-for="group in groupedMessages"
-      :key="group.id"
+      v-for="(group, index) in groupedMessages"
+      :key="index"
       class="message-group"
     >
       <div class="group-icon">
         <IconPerson
-          v-if="group[0].role === 'user'"
+          v-if="group[0]?.role === 'user'"
           class="icon"
         />
         <IconClaude
@@ -17,8 +17,8 @@
       </div>
       <div class="group-messages">
         <ChatMessage
-          v-for="message in group"
-          :key="message.id"
+          v-for="(message, messageIndex) in group"
+          :key="messageIndex"
           :message="message"
         />
       </div>
@@ -32,7 +32,7 @@ import { computed } from 'vue';
 import IconClaude from '@/components/__common/IconClaude.vue';
 import IconPerson from '@/components/__common/IconPerson.vue';
 
-import ChatMessage from './ChatMessage.vue';
+import ChatMessage, { type Model } from './ChatMessage.vue';
 
 const { messages } = defineProps<{
   messages: Message[];

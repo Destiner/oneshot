@@ -22,11 +22,11 @@
         <div class="side">
           <SelectTool
             :tools
-            v-model="selectedTool"
+            v-model="selectedToolId"
           >
             <template #trigger>
               <div class="button">
-                <template v-if="selectedTool === null">
+                <template v-if="!selectedTool">
                   <IconHammer class="icon" />
                   Tools
                 </template>
@@ -47,16 +47,18 @@
 </template>
 
 <script setup lang="ts">
+import type Anthropic from '@anthropic-ai/sdk';
 import { computed, ref, onMounted } from 'vue';
 
 import IconHammer from '@/components/__common/IconHammer.vue';
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
-import ApiService, { type Tool } from '@/services/api';
+import ApiService, { type Tool, type ToolId } from '@/services/api';
 import useEnv from '@/composables/useEnv';
 import useToolsStore from '@/stores/tools';
 
 import ChatMessages, { type Message } from './ChatMessages.vue';
 import SelectTool from './SelectTool.vue';
+import type { TextContent, ToolContent } from './ChatMessage.vue';
 
 const { apiBaseUrl } = useEnv();
 const toolsStore = useToolsStore();
@@ -65,13 +67,67 @@ const api = new ApiService(apiBaseUrl);
 
 const prompt = ref('');
 const messages = ref<Message[]>([]);
-const selectedTool = ref<Tool | null>(null);
+const selectedToolId = ref<ToolId | undefined>(undefined);
+const selectedTool = computed(() =>
+  selectedToolId.value
+    ? toolsStore.tools.find((tool) => tool.id === selectedToolId.value)
+    : null,
+);
 const tools = computed(() => toolsStore.tools);
 
 onMounted(async () => {
   const newTools = await api.getTools();
   toolsStore.setTools(newTools);
 });
+
+function convertMessages(messages: Message[]): Anthropic.MessageParam[] {
+  function generateToolUseId() {
+    const number = Math.floor(Math.random() * 1000000);
+    return `tool_id_${number}`;
+  }
+
+  const anthropicMessages: Anthropic.MessageParam[] = [];
+
+  for (const message of messages) {
+    for (const content of message.content) {
+      if (content.type === 'text') {
+        anthropicMessages.push({
+          role: message.role,
+          content: content.text,
+        });
+      } else if (content.type === 'tool') {
+        const toolUseId = generateToolUseId();
+        // Split tool content into tool_use (assistant) and tool_result (user) messages
+        anthropicMessages.push({
+          role: 'assistant',
+          content: [
+            {
+              type: 'tool_use',
+              id: toolUseId,
+              name: content.tool,
+              input: content.input ? JSON.parse(content.input) : {},
+            },
+          ],
+        });
+
+        if (content.output) {
+          anthropicMessages.push({
+            role: 'user',
+            content: [
+              {
+                type: 'tool_result',
+                tool_use_id: toolUseId,
+                content: content.output,
+              },
+            ],
+          });
+        }
+      }
+    }
+  }
+
+  return anthropicMessages;
+}
 
 async function send() {
   messages.value.push({
@@ -82,29 +138,39 @@ async function send() {
 
   const tools = selectedTool.value ? [selectedTool.value.id] : [];
 
+  const model = 'sonnet-3.5';
+
   await api.streamLlmChatResponse(
-    'sonnet-3.5',
-    messages.value,
+    model,
+    convertMessages(messages.value),
     tools,
+    // Convert Anthropic event to internal message structure
     (event) => {
       if (event.type === 'message_start') {
-        console.log(event.message);
         messages.value.push({
           role: event.message.role,
-          content: event.message.content,
+          model,
+          content: event.message.content as TextContent[],
         });
       } else if (event.type === 'content_block_start') {
         const newContentBlock = event.content_block;
-        if (newContentBlock.type === 'tool_use') {
-          newContentBlock.type = 'tool';
-          newContentBlock.tool = getToolId(newContentBlock.name);
-          newContentBlock.input = '';
-        }
-        messages.value[messages.value.length - 1].content.push(newContentBlock);
+        const contentBlock =
+          newContentBlock.type === 'tool_use'
+            ? ({
+                type: 'tool',
+                tool: getToolId(newContentBlock.name),
+                input: '',
+              } as ToolContent)
+            : newContentBlock;
+        const latestMessage = messages.value[messages.value.length - 1];
+        if (!latestMessage) return;
+        latestMessage.content.push(contentBlock);
       } else if (event.type === 'content_block_delta') {
         const latestMessage = messages.value[messages.value.length - 1];
+        if (!latestMessage) return;
         const latestContentBlock =
           latestMessage.content[latestMessage.content.length - 1];
+        if (!latestContentBlock) return;
         if (latestContentBlock.type === 'text') {
           const delta =
             event.delta.type === 'text_delta'
@@ -118,8 +184,10 @@ async function send() {
         }
       } else if (event.type === 'tool_result') {
         const latestMessage = messages.value[messages.value.length - 1];
+        if (!latestMessage) return;
         const latestContentBlock =
           latestMessage.content[latestMessage.content.length - 1];
+        if (!latestContentBlock) return;
         if (latestContentBlock.type === 'tool') {
           latestContentBlock.output = event.result;
         }
@@ -130,7 +198,7 @@ async function send() {
 
 function getToolId(name: string) {
   const toolId = name.split('_')[0];
-  return toolId;
+  return toolId as ToolId;
 }
 </script>
 
