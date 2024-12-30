@@ -1,3 +1,5 @@
+import { getStaticPath } from '@/utils';
+
 const TOOL_EXA = 'exa';
 const TOOL_SEQUENTIAL_THINKING = 'sequentialThinking';
 const TOOL_FILE_SYSTEM = 'fileSystem';
@@ -28,13 +30,13 @@ const TOOLS: Tool[] = [
   {
     id: TOOL_SEQUENTIAL_THINKING,
     name: 'Sequential Thinking',
-    iconUrl: '',
+    iconUrl: getStaticPath('icons/thinking.svg'),
     actionDescription: 'Thinking sequentially',
   },
   {
     id: TOOL_FILE_SYSTEM,
     name: 'File System',
-    iconUrl: '',
+    iconUrl: getStaticPath('icons/finder.png'),
     actionDescription: 'Accessing the file system',
   },
   {
