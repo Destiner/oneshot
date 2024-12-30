@@ -1,6 +1,9 @@
 <template>
   <div class="root">
-    <ChatMessages :messages />
+    <ChatMessages
+      :messages
+      ref="messagesEl"
+    />
     <div class="composer">
       <form @submit.prevent="send">
         <input
@@ -52,7 +55,7 @@ import { computed, ref, onMounted } from 'vue';
 
 import IconHammer from '@/components/__common/IconHammer.vue';
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
-import ApiService, { type Tool, type ToolId } from '@/services/api';
+import ApiService, { type ToolId } from '@/services/api';
 import useEnv from '@/composables/useEnv';
 import useToolsStore from '@/stores/tools';
 
@@ -137,9 +140,11 @@ async function send() {
   prompt.value = '';
 
   const tools = selectedTool.value ? [selectedTool.value.id] : [];
+  await request(tools);
+}
 
+async function request(tools: ToolId[]) {
   const model = 'sonnet-3.5';
-
   await api.streamLlmChatResponse(
     model,
     convertMessages(messages.value),
