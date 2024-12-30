@@ -1,46 +1,48 @@
 <template>
   <div class="content">
-    <div
-      v-for="(part, index) in message.content"
-      :key="index"
-    >
+    <TransitionGroup name="list">
       <div
-        v-if="part.type === 'text'"
-        class="text"
+        v-for="(part, index) in message.content"
+        :key="index"
       >
-        {{ part.text }}
-      </div>
-      <div
-        class="tool-call"
-        v-else-if="part.type === 'tool'"
-      >
-        <details>
-          <summary>
-            <ToolHeader
-              :id="part.toolId"
-              :command-id="part.commandId"
-              :is-done="!!part.output"
-            />
-          </summary>
-          <div class="tool-content">
-            <div
-              class="tool-input"
-              v-if="part.input"
-            >
-              <div>→</div>
-              <div>{{ part.input }}</div>
+        <div
+          v-if="part.type === 'text'"
+          class="text"
+        >
+          {{ part.text }}
+        </div>
+        <div
+          class="tool-call"
+          v-else-if="part.type === 'tool'"
+        >
+          <details>
+            <summary>
+              <ToolHeader
+                :id="part.toolId"
+                :command-id="part.commandId"
+                :is-done="!!part.output"
+              />
+            </summary>
+            <div class="tool-content">
+              <div
+                class="tool-input"
+                v-if="part.input"
+              >
+                <div>→</div>
+                <div>{{ part.input }}</div>
+              </div>
+              <div
+                class="tool-output"
+                v-if="part.output"
+              >
+                <div>←</div>
+                <div>{{ part.output }}</div>
+              </div>
             </div>
-            <div
-              class="tool-output"
-              v-if="part.output"
-            >
-              <div>←</div>
-              <div>{{ part.output }}</div>
-            </div>
-          </div>
-        </details>
+          </details>
+        </div>
       </div>
-    </div>
+    </TransitionGroup>
   </div>
 </template>
 
@@ -93,6 +95,17 @@ export type { Model, Message, TextContent, ToolContent };
   flex-direction: column;
   max-width: 80ch;
   gap: 8px;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.25s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  transform: translateY(8px);
+  opacity: 0;
 }
 
 .text {

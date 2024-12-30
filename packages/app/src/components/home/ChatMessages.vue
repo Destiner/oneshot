@@ -4,29 +4,31 @@
     ref="rootEl"
     @scroll="handleScroll"
   >
-    <div
-      v-for="(group, index) in groupedMessages"
-      :key="index"
-      class="message-group"
-    >
-      <div class="group-icon">
-        <IconPerson
-          v-if="group[0]?.role === 'user'"
-          class="icon"
-        />
-        <IconClaude
-          v-else
-          class="icon"
-        />
+    <TransitionGroup name="list">
+      <div
+        v-for="(group, index) in groupedMessages"
+        :key="index"
+        class="message-group"
+      >
+        <div class="group-icon">
+          <IconPerson
+            v-if="group[0]?.role === 'user'"
+            class="icon"
+          />
+          <IconClaude
+            v-else
+            class="icon"
+          />
+        </div>
+        <div class="group-messages">
+          <ChatMessage
+            v-for="(message, messageIndex) in group"
+            :key="messageIndex"
+            :message="message"
+          />
+        </div>
       </div>
-      <div class="group-messages">
-        <ChatMessage
-          v-for="(message, messageIndex) in group"
-          :key="messageIndex"
-          :message="message"
-        />
-      </div>
-    </div>
+    </TransitionGroup>
     <div ref="bottomEl" />
   </div>
 </template>
@@ -167,5 +169,16 @@ export type { Message };
   flex-direction: column;
   gap: 16px;
   padding-top: 4px;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  transform: translateY(8px);
+  opacity: 0;
 }
 </style>

@@ -57,7 +57,6 @@ const actionDescription = computed<string | null>(() => {
   display: flex;
   align-items: center;
   padding: 12px;
-  font-size: 16px;
   gap: 8px;
   cursor: default;
 }
