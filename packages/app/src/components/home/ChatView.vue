@@ -104,7 +104,7 @@ function convertMessages(messages: Message[]): Anthropic.MessageParam[] {
             {
               type: 'tool_use',
               id: toolUseId,
-              name: content.tool,
+              name: content.toolId,
               input: content.input ? JSON.parse(content.input) : {},
             },
           ],
@@ -158,7 +158,8 @@ async function send() {
           newContentBlock.type === 'tool_use'
             ? ({
                 type: 'tool',
-                tool: getToolId(newContentBlock.name),
+                toolId: getToolId(newContentBlock.name),
+                commandId: getCommandId(newContentBlock.name),
                 input: '',
               } as ToolContent)
             : newContentBlock;
@@ -199,6 +200,11 @@ async function send() {
 function getToolId(name: string) {
   const toolId = name.split('_')[0];
   return toolId as ToolId;
+}
+
+function getCommandId(name: string) {
+  const toolId = getToolId(name);
+  return name.substring(toolId.length + 1);
 }
 </script>
 

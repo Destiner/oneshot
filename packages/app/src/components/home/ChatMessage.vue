@@ -16,7 +16,11 @@
       >
         <details>
           <summary>
-            <ToolHeader :id="part.tool" />
+            <ToolHeader
+              :id="part.toolId"
+              :command-id="part.commandId"
+              :is-done="!!part.output"
+            />
           </summary>
           <div class="tool-content">
             <div
@@ -61,7 +65,8 @@ interface TextContent {
 
 interface ToolContent {
   type: 'tool';
-  tool: ToolId;
+  toolId: ToolId;
+  commandId: string;
   input: string;
   output?: string;
 }

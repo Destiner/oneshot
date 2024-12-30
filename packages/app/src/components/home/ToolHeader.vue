@@ -7,7 +7,7 @@
       class="icon"
       :src="tool.iconUrl"
     />
-    {{ tool.actionDescription }}
+    {{ actionDescription }}
   </div>
   <div
     class="header"
@@ -25,8 +25,10 @@ import useToolsStore from '@/stores/tools';
 
 const toolsStore = useToolsStore();
 
-const { id } = defineProps<{
+const { id, commandId, isDone } = defineProps<{
   id: ToolId;
+  commandId: string;
+  isDone: boolean;
 }>();
 
 const tools = computed(() => {
@@ -34,6 +36,19 @@ const tools = computed(() => {
 });
 const tool = computed(() => {
   return tools.value.find((tool) => tool.id === id);
+});
+
+const actionDescription = computed<string | null>(() => {
+  if (!tool.value) {
+    return null;
+  }
+  const command = tool.value.commands[commandId];
+  if (!command) {
+    return null;
+  }
+  return isDone
+    ? command.actionDescription.done
+    : command.actionDescription.progress;
 });
 </script>
 

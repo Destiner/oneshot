@@ -23,11 +23,19 @@ type ToolId =
   | typeof TOOL_LINEAR
   | typeof TOOL_E2B;
 
+interface Command {
+  description: string;
+  actionDescription: {
+    progress: string;
+    done: string;
+  };
+}
+
 interface Tool {
   id: ToolId;
   name: string;
   iconUrl: string;
-  actionDescription: string;
+  commands: Record<string, Command>;
 }
 
 class ApiService {
