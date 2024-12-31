@@ -4,7 +4,19 @@
     @update:model-value="handleModelValueUpdate"
   >
     <Select.Trigger class="trigger">
-      <slot name="trigger" />
+      <div class="button">
+        <template v-if="!selectedTool">
+          <IconHammer class="icon" />
+          Tools
+        </template>
+        <template v-else>
+          <img
+            :src="selectedTool.iconUrl"
+            class="icon"
+          />
+          {{ selectedTool.name }}
+        </template>
+      </div>
     </Select.Trigger>
 
     <Select.Content
@@ -15,6 +27,12 @@
       <div class="panel">
         <Select.Viewport class="viewport">
           <Select.Group>
+            <Select.Item
+              class="item"
+              :value="undefined"
+            >
+              <Select.ItemText> No tool </Select.ItemText>
+            </Select.Item>
             <Select.Item
               v-for="(tool, index) in tools"
               :key="index"
@@ -37,8 +55,11 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue';
 import { Select } from 'radix-vue/namespaced';
 
+import IconHammer from '@/components/__common/IconHammer.vue';
+import useToolsStore from '@/stores/tools';
 import type { Tool, ToolId } from '@/services/api';
 
 const selected = defineModel<ToolId | undefined>({
@@ -49,9 +70,18 @@ defineProps<{
   tools: Tool[];
 }>();
 
+const toolsStore = useToolsStore();
+
 function handleModelValueUpdate(value: string) {
   selected.value = value as ToolId;
 }
+
+const tools = computed(() => toolsStore.tools);
+const selectedTool = computed(() =>
+  selected.value
+    ? tools.value.find((tool) => tool.id === selected.value)
+    : null,
+);
 </script>
 
 <style scoped>
@@ -65,6 +95,21 @@ button {
   border: 1px solid #333;
   border-radius: 6px;
   background: #494949;
+}
+
+.button {
+  display: flex;
+  align-items: center;
+  padding: 8px;
+  border: none;
+  border-radius: 8px;
+  outline: none;
+  background: transparent;
+  gap: 8px;
+
+  &:hover {
+    background: #333;
+  }
 }
 
 .viewport {
@@ -90,5 +135,11 @@ button {
 .icon {
   width: 16px;
   height: 16px;
+}
+
+.icon-cross {
+  width: 12px;
+  height: 12px;
+  cursor: pointer;
 }
 </style>

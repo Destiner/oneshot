@@ -26,23 +26,7 @@
           <SelectTool
             :tools
             v-model="selectedToolId"
-          >
-            <template #trigger>
-              <div class="button">
-                <template v-if="!selectedTool">
-                  <IconHammer class="icon" />
-                  Tools
-                </template>
-                <template v-else>
-                  <img
-                    :src="selectedTool.iconUrl"
-                    class="icon"
-                  />
-                  {{ selectedTool.name }}
-                </template>
-              </div>
-            </template>
-          </SelectTool>
+          />
         </div>
       </div>
     </div>
@@ -53,7 +37,6 @@
 import type Anthropic from '@anthropic-ai/sdk';
 import { computed, ref, onMounted } from 'vue';
 
-import IconHammer from '@/components/__common/IconHammer.vue';
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
 import ApiService, { type ToolId } from '@/services/api';
 import type { Chat, Message, TextContent, ToolContent } from '@/stores/chats';
@@ -76,7 +59,7 @@ const prompt = ref('');
 const selectedToolId = ref<ToolId | undefined>(undefined);
 const selectedTool = computed(() =>
   selectedToolId.value
-    ? toolsStore.tools.find((tool) => tool.id === selectedToolId.value)
+    ? tools.value.find((tool) => tool.id === selectedToolId.value)
     : null,
 );
 const tools = computed(() => toolsStore.tools);
