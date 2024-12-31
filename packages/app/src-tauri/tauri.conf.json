@@ -1,6 +1,6 @@
 {
   "$schema": "https://schema.tauri.app/config/2",
-  "productName": "app",
+  "productName": "Oneshot",
   "version": "0.1.0",
   "identifier": "xyz.oneshot",
   "build": {
