@@ -14,12 +14,20 @@
         :class="{ 'in-progress': latestMessage.inProgress }"
       />
     </div>
-    <div class="messages">
-      <ChatMessage
-        v-for="(message, messageIndex) in group"
-        :key="messageIndex"
-        :message="message"
-      />
+    <div class="content">
+      <div
+        class="name"
+        v-if="roleName"
+      >
+        {{ roleName }}
+      </div>
+      <div class="messages">
+        <ChatMessage
+          v-for="(message, messageIndex) in group"
+          :key="messageIndex"
+          :message="message"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -38,6 +46,19 @@ const { group } = defineProps<{
 
 const latestMessage = computed(() => {
   return group[group.length - 1];
+});
+
+const roleName = computed(() => {
+  if (!latestMessage.value) {
+    return null;
+  }
+  if (latestMessage.value.role === 'user') {
+    return 'You';
+  }
+  switch (latestMessage.value.model) {
+    case 'sonnet-3.5':
+      return 'Claude Sonnet 3.5';
+  }
 });
 </script>
 
@@ -67,11 +88,20 @@ const latestMessage = computed(() => {
   opacity: 0.5;
 }
 
-.messages {
+.content {
   display: flex;
   flex: 1;
   flex-direction: column;
-  gap: 16px;
+  gap: 4px;
   padding-top: 4px;
+}
+
+.name {
+  font-weight: 500;
+}
+
+.messages {
+  gap: 16px;
+  display: flex;
 }
 </style>
