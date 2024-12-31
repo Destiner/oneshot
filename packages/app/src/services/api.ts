@@ -4,6 +4,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 
 type StreamEvent =
   | Anthropic.Messages.RawMessageStreamEvent
+  | Anthropic.ErrorResponse
   | {
       type: 'tool_result';
       toolUseId: string;

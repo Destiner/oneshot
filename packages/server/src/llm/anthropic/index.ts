@@ -1,6 +1,6 @@
 import { promisify } from 'node:util';
 
-import Anthropic from '@anthropic-ai/sdk';
+import Anthropic, { type AnthropicError } from '@anthropic-ai/sdk';
 import { AnthropicChatAdapter, MultiClient } from '@smithery/sdk';
 import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js';
 
@@ -13,6 +13,7 @@ import {
 
 type StreamEvent =
   | Anthropic.Messages.RawMessageStreamEvent
+  | Anthropic.ErrorResponse
   | {
       type: 'tool_result';
       toolUseId: string;
@@ -113,6 +114,16 @@ async function streamResponse(
       (event) => {
         onEvent(event);
       },
+      (e) => {
+        const errorMessage = e.message;
+        const errorCode = errorMessage.split(' ')[0];
+        if (!errorCode) {
+          return;
+        }
+        const errorText = errorMessage.substring(errorCode.length);
+        const error = JSON.parse(errorText) as Anthropic.ErrorResponse;
+        onEvent(error);
+      },
     );
     anthropicMessages.push({
       role: newMessage.role,
@@ -157,6 +168,7 @@ async function requestStreamCallback(
   messages: Anthropic.MessageParam[],
   tools: Anthropic.Messages.Tool[],
   onEvent: (event: Anthropic.MessageStreamEvent) => void,
+  onError: (err: AnthropicError) => void,
   onFinish: (err: Error | null, value: Anthropic.Message) => void,
 ) {
   const response = anthropic.messages.stream({
@@ -166,6 +178,9 @@ async function requestStreamCallback(
     tools,
   });
   response.on('streamEvent', onEvent);
+  response.on('error', (e) => {
+    onError(e);
+  });
   // Resolve when the message is received
   response.on('message', (message) => onFinish(null, message));
 }

@@ -1,5 +1,8 @@
 <template>
-  <div class="content">
+  <div
+    class="content"
+    :class="{ error: message.role === 'assistant' && message.isError }"
+  >
     <TransitionGroup name="list">
       <div
         v-for="(part, index) in message.content"
@@ -53,7 +56,7 @@ defineProps<{
 </script>
 
 <script lang="ts">
-import { type Message } from '@/composables/useChat';
+import type { Message } from '@/stores/chats';
 
 import ToolHeader from './ToolHeader.vue';
 </script>
@@ -65,6 +68,10 @@ import ToolHeader from './ToolHeader.vue';
   max-width: 80ch;
   overflow: scroll;
   gap: 8px;
+}
+
+.error {
+  color: #da5757;
 }
 
 .list-enter-active,

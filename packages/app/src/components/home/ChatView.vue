@@ -160,6 +160,7 @@ async function request(tools: ToolId[]) {
           model,
           content: event.message.content as TextContent[],
           inProgress: true,
+          isError: false,
         });
       } else if (event.type === 'content_block_start') {
         const newContentBlock = event.content_block;
@@ -209,6 +210,20 @@ async function request(tools: ToolId[]) {
         if (latestContentBlock.type === 'tool') {
           latestContentBlock.output = event.result;
         }
+      } else if (event.type === 'error') {
+        const latestAssistantMessage = chat.messages.findLast(
+          (message) => message.role === 'assistant',
+        );
+        if (latestAssistantMessage) {
+          latestAssistantMessage.inProgress = false;
+        }
+        chat.messages.push({
+          role: 'assistant',
+          model,
+          content: [{ type: 'text', text: event.error.message }],
+          inProgress: false,
+          isError: true,
+        });
       }
     },
   );

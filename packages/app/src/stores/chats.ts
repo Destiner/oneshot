@@ -30,6 +30,7 @@ interface AssistantMessage {
   model: Model;
   content: MessageContent[];
   inProgress: boolean;
+  isError: boolean;
 }
 
 interface Chat {
