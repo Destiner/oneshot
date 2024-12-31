@@ -11,6 +11,8 @@ import {
   type ToolId,
 } from '@/llm/tools.js';
 
+type Model = 'claude-3-5-sonnet-latest' | 'claude-3-5-haiku-latest';
+
 type StreamEvent =
   | Anthropic.Messages.RawMessageStreamEvent
   | Anthropic.ErrorResponse
@@ -91,6 +93,7 @@ async function init() {
 }
 
 async function streamResponse(
+  model: Model,
   messages: Anthropic.MessageParam[],
   tools: ToolId[],
   onEvent: (event: StreamEvent) => Promise<void>,
@@ -109,6 +112,7 @@ async function streamResponse(
   let isDone = false;
   while (!isDone) {
     const newMessage = await requestStream(
+      model,
       anthropicMessages,
       toolsToUse,
       (event) => {
@@ -160,11 +164,61 @@ async function streamResponse(
   }
 }
 
+async function getTitle(messages: Anthropic.MessageParam[]) {
+  const anthropicMessages: Anthropic.MessageParam[] = messages.map((msg) => ({
+    role: msg.role as Anthropic.MessageParam['role'],
+    content: msg.content,
+  }));
+
+  const response = await anthropic.messages.create({
+    model: 'claude-3-5-haiku-latest',
+    max_tokens: 1024,
+    system: `
+Give a short title for the chat below. Do not output anything else. Prefer 3-5 words. Don't paraphrase the words in the chat unless absolutely necessary. 
+      
+Some examples:
+      
+1. User: "How do I prepare a traditional Italian carbonara from scratch?"
+Expected title: "Carbonara Recipe" or "Italian Cooking"
+
+2. User: "What are the main differences between Python and JavaScript?"
+Expected title: "Python vs JavaScript" or "Programming Language Comparison"
+
+3. User: "My cat has been sleeping more than usual lately. Should I be worried?"
+Expected title: "Cat Health Concerns" or "Pet Behavior"
+
+4. User: "Can you help me understand quantum entanglement in simple terms?"
+Expected title: "Quantum Physics Basics" or "Understanding Entanglement"
+
+5. User: "I need tips for negotiating a salary for my first job."
+Expected title: "Salary Negotiation" or "Career Advice"
+
+6. User: "What's causing the current conflict between Country A and Country B?"
+Expected title: "Geopolitical Conflict Analysis" or "International Relations"
+
+7. User: "How can I improve my landscape photography skills?"
+Expected title: "Photography Tips" or "Landscape Photo Guide"
+
+8. User: "What are some exercises I can do at home without any equipment?"
+Expected title: "Home Workout" or "No-Equipment Exercise"`,
+    messages: anthropicMessages,
+  });
+
+  const content = response.content;
+  const firstBlock = content[0];
+
+  if (!firstBlock) {
+    return '';
+  }
+  return firstBlock.type === 'text' ? firstBlock.text : '';
+}
+
 async function getTools(): Promise<Tool[]> {
   return TOOLS;
 }
 
 async function requestStreamCallback(
+  model: Model,
   messages: Anthropic.MessageParam[],
   tools: Anthropic.Messages.Tool[],
   onEvent: (event: Anthropic.MessageStreamEvent) => void,
@@ -172,7 +226,7 @@ async function requestStreamCallback(
   onFinish: (err: Error | null, value: Anthropic.Message) => void,
 ) {
   const response = anthropic.messages.stream({
-    model: 'claude-3-5-sonnet-latest',
+    model,
     max_tokens: 1024,
     messages,
     tools,
@@ -189,5 +243,5 @@ const requestStream = promisify(requestStreamCallback);
 
 init();
 
-export { streamResponse, getTools };
+export { streamResponse, getTitle, getTools };
 export type { StreamEvent };

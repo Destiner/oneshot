@@ -1,9 +1,10 @@
 import { Hono } from 'hono';
 
 import {
+  type StreamEvent as AnthropicStreamEvent,
   streamResponse,
   getTools,
-  type StreamEvent as AnthropicStreamEvent,
+  getTitle,
 } from './anthropic/index.js';
 import { streamSSE } from 'hono/streaming';
 
@@ -17,17 +18,27 @@ const route = llm
     if (!model) {
       return c.text('Model is required', 400);
     }
-    if (model !== 'sonnet-3.5') {
+    if (
+      model !== 'claude-3-5-sonnet-latest' &&
+      model !== 'claude-3-5-haiku-latest'
+    ) {
       return c.text('Model is not supported', 400);
     }
 
     return streamSSE(c, async (stream) => {
-      await streamResponse(messages, tools, async (event) => {
+      await streamResponse(model, messages, tools, async (event) => {
         await stream.writeSSE({
           data: JSON.stringify(event),
         });
       });
     });
+  })
+  .post('/chat/title', async (c) => {
+    const { messages } = await c.req.json();
+
+    const title = await getTitle(messages);
+
+    return c.json({ title });
   })
   .get('/tools', async (c) => {
     const tools = await getTools();

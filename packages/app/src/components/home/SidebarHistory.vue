@@ -8,7 +8,7 @@
         :class="{ selected: isSelected(index) }"
         @click="handleSelectChat(index)"
       >
-        {{ chat.title }}
+        {{ chat.title ?? 'New Chat' }}
       </div>
     </div>
   </div>

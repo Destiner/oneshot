@@ -56,8 +56,10 @@ const roleName = computed(() => {
     return 'You';
   }
   switch (latestMessage.value.model) {
-    case 'sonnet-3.5':
+    case 'claude-3-5-sonnet-latest':
       return 'Claude Sonnet 3.5';
+    case 'claude-3-5-haiku-latest':
+      return 'Claude Haiku 3.5';
   }
 });
 </script>

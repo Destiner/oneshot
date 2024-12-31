@@ -127,12 +127,22 @@ async function send() {
   });
   prompt.value = '';
 
+  requestTitle();
   const tools = selectedTool.value ? [selectedTool.value.id] : [];
-  await request(tools);
+  request(tools);
+}
+
+async function requestTitle() {
+  // Only request once
+  if (chat.title) {
+    return;
+  }
+  const response = await api.getTitle(convertMessages(chat.messages));
+  chat.title = response.title;
 }
 
 async function request(tools: ToolId[]) {
-  const model = 'sonnet-3.5';
+  const model = 'claude-3-5-sonnet-latest';
   await api.streamLlmChatResponse(
     model,
     convertMessages(chat.messages),

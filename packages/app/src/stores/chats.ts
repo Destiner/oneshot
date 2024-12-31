@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 type Message = UserMessage | AssistantMessage;
-type Model = 'sonnet-3.5';
+type Model = 'claude-3-5-sonnet-latest' | 'claude-3-5-haiku-latest';
 
 interface TextContent {
   type: 'text';
@@ -34,7 +34,7 @@ interface AssistantMessage {
 }
 
 interface Chat {
-  title: string;
+  title: string | null;
   messages: Message[];
 }
 

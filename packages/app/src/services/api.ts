@@ -1,6 +1,7 @@
 import ky, { type KyInstance } from 'ky';
 
 import type Anthropic from '@anthropic-ai/sdk';
+import type { Model } from '@/stores/chats';
 
 type StreamEvent =
   | Anthropic.Messages.RawMessageStreamEvent
@@ -49,7 +50,7 @@ class ApiService {
   }
 
   async streamLlmChatResponse(
-    model: 'sonnet-3.5',
+    model: Model,
     messages: Anthropic.MessageParam[],
     tools: ToolId[],
     onEvent: (event: StreamEvent) => void,
@@ -87,6 +88,13 @@ class ApiService {
         }
       }
     }
+  }
+
+  async getTitle(messages: Anthropic.MessageParam[]) {
+    const response = await this.client.post('llm/chat/title', {
+      json: { messages },
+    });
+    return response.json<{ title: string }>();
   }
 
   async getTools() {

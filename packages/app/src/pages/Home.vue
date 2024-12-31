@@ -44,7 +44,7 @@ function handleToggleSidebar() {
 
 function handleNewChat() {
   chats.value.push({
-    title: 'New Chat',
+    title: null,
     messages: [],
   });
   selectedChatIndex.value = chats.value.length - 1;
