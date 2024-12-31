@@ -1,7 +1,7 @@
 <template>
   <div class="root">
     <ChatMessages
-      :messages
+      :messages="chat.messages"
       ref="messagesEl"
     />
     <div class="composer">
@@ -56,12 +56,16 @@ import { computed, ref, onMounted } from 'vue';
 import IconHammer from '@/components/__common/IconHammer.vue';
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
 import ApiService, { type ToolId } from '@/services/api';
+import type { Chat, Message, TextContent, ToolContent } from '@/stores/chats';
 import useEnv from '@/composables/useEnv';
 import useToolsStore from '@/stores/tools';
 
-import ChatMessages, { type Message } from './ChatMessages.vue';
+import ChatMessages from './ChatMessages.vue';
 import SelectTool from './SelectTool.vue';
-import type { TextContent, ToolContent } from './ChatMessage.vue';
+
+const { chat } = defineProps<{
+  chat: Chat;
+}>();
 
 const { apiBaseUrl } = useEnv();
 const toolsStore = useToolsStore();
@@ -69,7 +73,6 @@ const toolsStore = useToolsStore();
 const api = new ApiService(apiBaseUrl);
 
 const prompt = ref('');
-const messages = ref<Message[]>([]);
 const selectedToolId = ref<ToolId | undefined>(undefined);
 const selectedTool = computed(() =>
   selectedToolId.value
@@ -133,7 +136,7 @@ function convertMessages(messages: Message[]): Anthropic.MessageParam[] {
 }
 
 async function send() {
-  messages.value.push({
+  chat.messages.push({
     role: 'user',
     content: [{ type: 'text', text: prompt.value }],
   });
@@ -147,12 +150,12 @@ async function request(tools: ToolId[]) {
   const model = 'sonnet-3.5';
   await api.streamLlmChatResponse(
     model,
-    convertMessages(messages.value),
+    convertMessages(chat.messages),
     tools,
     // Convert Anthropic event to internal message structure
     (event) => {
       if (event.type === 'message_start') {
-        messages.value.push({
+        chat.messages.push({
           role: event.message.role,
           model,
           content: event.message.content as TextContent[],
@@ -168,11 +171,11 @@ async function request(tools: ToolId[]) {
                 input: '',
               } as ToolContent)
             : newContentBlock;
-        const latestMessage = messages.value[messages.value.length - 1];
+        const latestMessage = chat.messages[chat.messages.length - 1];
         if (!latestMessage) return;
         latestMessage.content.push(contentBlock);
       } else if (event.type === 'content_block_delta') {
-        const latestMessage = messages.value[messages.value.length - 1];
+        const latestMessage = chat.messages[chat.messages.length - 1];
         if (!latestMessage) return;
         const latestContentBlock =
           latestMessage.content[latestMessage.content.length - 1];
@@ -189,7 +192,7 @@ async function request(tools: ToolId[]) {
           }
         }
       } else if (event.type === 'tool_result') {
-        const latestMessage = messages.value[messages.value.length - 1];
+        const latestMessage = chat.messages[chat.messages.length - 1];
         if (!latestMessage) return;
         const latestContentBlock =
           latestMessage.content[latestMessage.content.length - 1];

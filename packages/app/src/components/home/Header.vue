@@ -20,11 +20,17 @@
     </div>
     <div class="title-container">
       <span class="title">{{ title }}</span>
+      <div class="split" />
+      <IconCompose
+        class="icon"
+        @click="handleComposeIconClick"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import IconCompose from '@/components/__common/IconCompose.vue';
 import IconSidebar from '@/components/__common/IconSidebar.vue';
 
 defineProps<{
@@ -34,10 +40,15 @@ defineProps<{
 
 const emit = defineEmits<{
   'toggle-sidebar': [];
+  'new-chat': [];
 }>();
 
 function handleSidebarIconClick() {
   emit('toggle-sidebar');
+}
+
+function handleComposeIconClick() {
+  emit('new-chat');
 }
 </script>
 
@@ -70,7 +81,9 @@ function handleSidebarIconClick() {
 
 .title-container {
   display: flex;
+  gap: 8px;
   flex: 1;
+  align-items: center;
   height: var(--height);
   padding: 8px;
   border-bottom: 1px solid #000;
@@ -78,7 +91,7 @@ function handleSidebarIconClick() {
 
 .icon {
   width: 20px;
-  height: 18px;
+  height: 20px;
   padding: 6px 10px;
   color: #bcbdbd;
 
@@ -92,5 +105,11 @@ function handleSidebarIconClick() {
   padding: 8px;
   font-weight: bold;
   cursor: default;
+}
+
+.split {
+  width: 1px;
+  height: 100%;
+  background: #5d5e5e;
 }
 </style>

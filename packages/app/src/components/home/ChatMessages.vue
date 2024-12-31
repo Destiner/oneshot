@@ -4,31 +4,29 @@
     ref="rootEl"
     @scroll="handleScroll"
   >
-    <TransitionGroup name="list">
-      <div
-        v-for="(group, index) in groupedMessages"
-        :key="index"
-        class="message-group"
-      >
-        <div class="group-icon">
-          <IconPerson
-            v-if="group[0]?.role === 'user'"
-            class="icon"
-          />
-          <IconClaude
-            v-else
-            class="icon"
-          />
-        </div>
-        <div class="group-messages">
-          <ChatMessage
-            v-for="(message, messageIndex) in group"
-            :key="messageIndex"
-            :message="message"
-          />
-        </div>
+    <div
+      v-for="(group, index) in groupedMessages"
+      :key="index"
+      class="message-group"
+    >
+      <div class="group-icon">
+        <IconPerson
+          v-if="group[0]?.role === 'user'"
+          class="icon"
+        />
+        <IconClaude
+          v-else
+          class="icon"
+        />
       </div>
-    </TransitionGroup>
+      <div class="group-messages">
+        <ChatMessage
+          v-for="(message, messageIndex) in group"
+          :key="messageIndex"
+          :message="message"
+        />
+      </div>
+    </div>
     <div ref="bottomEl" />
   </div>
 </template>
@@ -38,8 +36,9 @@ import { computed, nextTick, useTemplateRef, ref, watch } from 'vue';
 
 import IconClaude from '@/components/__common/IconClaude.vue';
 import IconPerson from '@/components/__common/IconPerson.vue';
+import type { Message, Model } from '@/composables/useChat';
 
-import ChatMessage, { type Model } from './ChatMessage.vue';
+import ChatMessage from './ChatMessage.vue';
 
 const { messages } = defineProps<{
   messages: Message[];
@@ -128,12 +127,6 @@ const groupedMessages = computed<Message[][]>(() => {
 });
 </script>
 
-<script lang="ts">
-import { type Message } from './ChatMessage.vue';
-
-export type { Message };
-</script>
-
 <style scoped>
 .messages {
   display: flex;
@@ -169,16 +162,5 @@ export type { Message };
   flex-direction: column;
   gap: 16px;
   padding-top: 4px;
-}
-
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s ease;
-}
-
-.list-enter-from,
-.list-leave-to {
-  transform: translateY(8px);
-  opacity: 0;
 }
 </style>

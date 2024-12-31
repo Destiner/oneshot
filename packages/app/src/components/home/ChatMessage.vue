@@ -53,40 +53,9 @@ defineProps<{
 </script>
 
 <script lang="ts">
-import { type ToolId } from '@/services/api';
+import { type Message } from '@/composables/useChat';
 
 import ToolHeader from './ToolHeader.vue';
-
-type Message = UserMessage | AssistantMessage;
-type Model = 'sonnet-3.5';
-
-interface TextContent {
-  type: 'text';
-  text: string;
-}
-
-interface ToolContent {
-  type: 'tool';
-  toolId: ToolId;
-  commandId: string;
-  input: string;
-  output?: string;
-}
-
-type MessageContent = TextContent | ToolContent;
-
-interface UserMessage {
-  role: 'user';
-  content: MessageContent[];
-}
-
-interface AssistantMessage {
-  role: 'assistant';
-  model: Model;
-  content: MessageContent[];
-}
-
-export type { Model, Message, TextContent, ToolContent };
 </script>
 
 <style scoped>
