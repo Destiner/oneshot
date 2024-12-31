@@ -1,6 +1,6 @@
 import type { ToolId } from '@/services/api';
 import { defineStore } from 'pinia';
-import { ref, type Ref } from 'vue';
+import { ref } from 'vue';
 
 type Message = UserMessage | AssistantMessage;
 type Model = 'sonnet-3.5';
@@ -29,6 +29,7 @@ interface AssistantMessage {
   role: 'assistant';
   model: Model;
   content: MessageContent[];
+  inProgress: boolean;
 }
 
 interface Chat {

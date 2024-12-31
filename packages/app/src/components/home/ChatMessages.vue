@@ -1,44 +1,22 @@
 <template>
   <div
-    class="messages"
+    class="chat-messages"
     ref="rootEl"
     @scroll="handleScroll"
   >
-    <div
+    <ChatMessageGroup
       v-for="(group, index) in groupedMessages"
       :key="index"
-      class="message-group"
-    >
-      <div class="group-icon">
-        <IconPerson
-          v-if="group[0]?.role === 'user'"
-          class="icon"
-        />
-        <IconClaude
-          v-else
-          class="icon"
-        />
-      </div>
-      <div class="group-messages">
-        <ChatMessage
-          v-for="(message, messageIndex) in group"
-          :key="messageIndex"
-          :message="message"
-        />
-      </div>
-    </div>
+      :group="group"
+    />
     <div ref="bottomEl" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, useTemplateRef, ref, watch } from 'vue';
-
-import IconClaude from '@/components/__common/IconClaude.vue';
-import IconPerson from '@/components/__common/IconPerson.vue';
-import type { Message, Model } from '@/composables/useChat';
-
-import ChatMessage from './ChatMessage.vue';
+import type { Message, Model } from '@/stores/chats';
+import ChatMessageGroup from './ChatMessageGroup.vue';
 
 const { messages } = defineProps<{
   messages: Message[];
@@ -128,39 +106,11 @@ const groupedMessages = computed<Message[][]>(() => {
 </script>
 
 <style scoped>
-.messages {
+.chat-messages {
   display: flex;
   flex-direction: column;
   padding: 16px;
   overflow-y: scroll;
   gap: 24px;
-}
-
-.message-group {
-  display: flex;
-  gap: 16px;
-}
-
-.group-icon {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-
-  .icon {
-    width: 24px;
-    height: 24px;
-  }
-}
-
-.group-messages {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  gap: 16px;
-  padding-top: 4px;
 }
 </style>

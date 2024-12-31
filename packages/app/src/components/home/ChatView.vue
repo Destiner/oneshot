@@ -159,6 +159,7 @@ async function request(tools: ToolId[]) {
           role: event.message.role,
           model,
           content: event.message.content as TextContent[],
+          inProgress: true,
         });
       } else if (event.type === 'content_block_start') {
         const newContentBlock = event.content_block;
@@ -191,6 +192,14 @@ async function request(tools: ToolId[]) {
             latestContentBlock.input += event.delta.partial_json;
           }
         }
+      } else if (event.type === 'message_stop') {
+        const latestAssistantMessage = chat.messages.findLast(
+          (message) => message.role === 'assistant',
+        );
+        if (!latestAssistantMessage) {
+          return;
+        }
+        latestAssistantMessage.inProgress = false;
       } else if (event.type === 'tool_result') {
         const latestMessage = chat.messages[chat.messages.length - 1];
         if (!latestMessage) return;
