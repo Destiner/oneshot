@@ -63,6 +63,7 @@ import ToolHeader from './ToolHeader.vue';
   display: flex;
   flex-direction: column;
   max-width: 80ch;
+  overflow: scroll;
   gap: 8px;
 }
 

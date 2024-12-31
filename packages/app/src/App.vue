@@ -4,6 +4,7 @@
 
 <style>
 :root {
+  overflow: hidden;
   background: #2f2f2f;
   color: #f6f6f6;
   font-family: 'SF Pro Text', sans-serif;
