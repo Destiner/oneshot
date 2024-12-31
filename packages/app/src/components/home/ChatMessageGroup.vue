@@ -90,7 +90,6 @@ const roleName = computed(() => {
 
 .content {
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 4px;
   padding-top: 4px;
@@ -103,5 +102,6 @@ const roleName = computed(() => {
 .messages {
   gap: 16px;
   display: flex;
+  flex-direction: column;
 }
 </style>

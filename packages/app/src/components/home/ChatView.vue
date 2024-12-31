@@ -6,10 +6,11 @@
     />
     <div class="composer">
       <form @submit.prevent="send">
-        <input
-          type="text"
+        <AutoResizeTextarea
           v-model="prompt"
           placeholder="Ask anything…"
+          @keydown.enter.exact.prevent="send"
+          @keydown.alt.enter.prevent="prompt += '\n'"
         />
         <button
           class="button"
@@ -38,6 +39,7 @@ import type Anthropic from '@anthropic-ai/sdk';
 import { computed, ref, onMounted } from 'vue';
 
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
+import AutoResizeTextarea from '@/components/__common/AutoResizeTextarea.vue';
 import ApiService, { type ToolId } from '@/services/api';
 import type { Chat, Message, TextContent, ToolContent } from '@/stores/chats';
 import useEnv from '@/composables/useEnv';
@@ -276,20 +278,6 @@ form {
     &:hover {
       background: #333;
     }
-  }
-}
-
-input {
-  width: 100%;
-  padding: 8px;
-  border: none;
-  outline: none;
-  background: transparent;
-  color: white;
-  font-size: 16px;
-
-  &::placeholder {
-    color: #a4a4a4;
   }
 }
 

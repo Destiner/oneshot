@@ -1,6 +1,6 @@
 <template>
   <div
-    class="content"
+    class="message"
     :class="{ error: message.role === 'assistant' && message.isError }"
   >
     <TransitionGroup name="list">
@@ -62,7 +62,7 @@ import ToolHeader from './ToolHeader.vue';
 </script>
 
 <style scoped>
-.content {
+.message {
   display: flex;
   flex-direction: column;
   max-width: 80ch;
