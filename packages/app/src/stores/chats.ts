@@ -40,12 +40,18 @@ interface Chat {
 
 const useStore = defineStore('chats', () => {
   const chats = ref<Chat[]>([]);
+  const selectedChatIndex = ref<number>(0);
 
   function setChats(newChats: Chat[]) {
     chats.value = newChats;
+    setSelectedChatIndex(newChats.length - 1);
   }
 
-  return { chats, setChats };
+  function setSelectedChatIndex(index: number) {
+    selectedChatIndex.value = index;
+  }
+
+  return { chats, setChats, selectedChatIndex, setSelectedChatIndex };
 });
 
 export default useStore;
