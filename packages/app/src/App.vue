@@ -2,6 +2,23 @@
   <RouterView />
 </template>
 
+<script setup lang="ts">
+import { onMounted } from 'vue';
+
+import useStore from '@/composables/useStore';
+import useChatsStore, { type Chat } from '@/stores/chats';
+
+const store = useStore();
+const chatsStore = useChatsStore();
+
+onMounted(async () => {
+  const chats = await store.get<Chat[]>('chats');
+  if (chats) {
+    chatsStore.setChats(chats);
+  }
+});
+</script>
+
 <style>
 :root {
   overflow: hidden;

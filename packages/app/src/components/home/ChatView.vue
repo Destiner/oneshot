@@ -52,9 +52,12 @@ const { chat } = defineProps<{
   chat: Chat;
 }>();
 
+const emit = defineEmits<{
+  'new-message': [];
+}>();
+
 const { apiBaseUrl } = useEnv();
 const toolsStore = useToolsStore();
-
 const api = new ApiService(apiBaseUrl);
 
 const prompt = ref('');
@@ -129,7 +132,8 @@ async function send() {
 
   requestTitle();
   const tools = selectedTool.value ? [selectedTool.value.id] : [];
-  request(tools);
+  await request(tools);
+  emit('new-message');
 }
 
 async function requestTitle() {

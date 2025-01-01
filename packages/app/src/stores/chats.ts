@@ -41,7 +41,11 @@ interface Chat {
 const useStore = defineStore('chats', () => {
   const chats = ref<Chat[]>([]);
 
-  return { chats };
+  function setChats(newChats: Chat[]) {
+    chats.value = newChats;
+  }
+
+  return { chats, setChats };
 });
 
 export default useStore;

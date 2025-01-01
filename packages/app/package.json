@@ -13,6 +13,7 @@
     "@anthropic-ai/sdk": "^0.33.1",
     "@tauri-apps/api": "^2",
     "@tauri-apps/plugin-opener": "^2",
+    "@tauri-apps/plugin-store": "~2",
     "ky": "^1.7.4",
     "pinia": "^2.3.0",
     "radix-vue": "^1.9.11",
