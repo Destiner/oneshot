@@ -24,6 +24,7 @@ const route = app
 export default {
   port: Number(port),
   fetch: app.fetch,
+  idleTimeout: 60,
 };
 
 type App = typeof route;
