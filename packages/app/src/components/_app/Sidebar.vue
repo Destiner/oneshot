@@ -6,9 +6,15 @@
         :key="index"
         class="item"
         :class="{ selected: isSelected(index) }"
-        @click="handleSelectChat(index)"
       >
-        {{ chat.title ?? 'New Chat' }}
+        <RouterLink :to="`/${getReverseIndex(index)}`">
+          {{ chat.title ?? 'New Chat' }}
+        </RouterLink>
+      </div>
+    </div>
+    <div class="options">
+      <div class="option">
+        <RouterLink to="/tools">Tools</RouterLink>
       </div>
     </div>
   </div>
@@ -21,16 +27,8 @@ import type { Chat } from '@/stores/chats';
 
 const { chats, selectedChatIndex } = defineProps<{
   chats: Chat[];
-  selectedChatIndex: number;
+  selectedChatIndex: number | null;
 }>();
-
-const emit = defineEmits<{
-  'select-chat': [index: number];
-}>();
-
-function handleSelectChat(index: number) {
-  emit('select-chat', getReverseIndex(index));
-}
 
 // Reverse the order of the chats
 const orderedChats = computed(() => {
@@ -49,6 +47,9 @@ function getReverseIndex(index: number) {
 
 <style scoped>
 .root {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   width: 250px;
   padding: 8px;
   border-right: 1px solid #000;
@@ -68,6 +69,28 @@ function getReverseIndex(index: number) {
 
   &.selected {
     background: #5d5e5e;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+}
+
+.options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.option {
+  padding: 8px;
+  border-radius: 4px;
+  cursor: default;
+
+  a {
+    color: inherit;
+    text-decoration: none;
   }
 }
 </style>

@@ -1,12 +1,20 @@
 import { Hono } from 'hono';
+import { streamSSE } from 'hono/streaming';
 
 import {
   type StreamEvent as AnthropicStreamEvent,
   streamResponse,
-  getTools,
   getTitle,
+  reconnect,
 } from './anthropic/index.js';
-import { streamSSE } from 'hono/streaming';
+import {
+  type ToolId,
+  getTools,
+  enableTool,
+  disableTool,
+  setToolArgs,
+  setToolEnv,
+} from './tools.js';
 
 const llm = new Hono();
 
@@ -43,6 +51,32 @@ const route = llm
   .get('/tools', async (c) => {
     const tools = await getTools();
     return c.json(tools);
+  })
+  .put('/tool/:id/enable', async (c) => {
+    const { id } = c.req.param();
+    enableTool(id as ToolId);
+    await reconnect();
+    return c.json({ id });
+  })
+  .put('/tool/:id/disable', async (c) => {
+    const { id } = c.req.param();
+    disableTool(id as ToolId);
+    await reconnect();
+    return c.json({ id });
+  })
+  .put('/tool/:id/args', async (c) => {
+    const { id } = c.req.param();
+    const { args } = await c.req.json();
+    setToolArgs(id as ToolId, args);
+    await reconnect();
+    return c.json({ id });
+  })
+  .put('/tool/:id/env', async (c) => {
+    const { id } = c.req.param();
+    const { env } = await c.req.json();
+    setToolEnv(id as ToolId, env);
+    await reconnect();
+    return c.json({ id });
   });
 
 type Route = typeof route;

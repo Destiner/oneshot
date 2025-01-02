@@ -5,13 +5,25 @@ const TOOL_SEQUENTIAL_THINKING = 'sequentialThinking';
 const TOOL_FILE_SYSTEM = 'fileSystem';
 const TOOL_LINEAR = 'linear';
 const TOOL_E2B = 'e2b';
+const TOOL_OBSIDIAN = 'obsidian';
+const TOOL_BRAVE_SEARCH = 'braveSearch';
+const TOOL_YOUTUBE_TRANSCRIPT = 'youtubeTranscript';
+const TOOL_GITHUB = 'github';
+const TOOL_MEMORY_GRAPH = 'memoryGraph';
+const TOOL_GOOGLE_MAPS = 'googleMaps';
 
 type ToolId =
   | typeof TOOL_EXA
   | typeof TOOL_SEQUENTIAL_THINKING
   | typeof TOOL_FILE_SYSTEM
   | typeof TOOL_LINEAR
-  | typeof TOOL_E2B;
+  | typeof TOOL_E2B
+  | typeof TOOL_OBSIDIAN
+  | typeof TOOL_BRAVE_SEARCH
+  | typeof TOOL_YOUTUBE_TRANSCRIPT
+  | typeof TOOL_GITHUB
+  | typeof TOOL_MEMORY_GRAPH
+  | typeof TOOL_GOOGLE_MAPS;
 
 interface Command {
   description: string;
@@ -25,6 +37,10 @@ interface Tool {
   id: ToolId;
   name: string;
   iconUrl: string;
+  package: string;
+  args: string[] | null;
+  env: Record<string, string>;
+  enabled: boolean;
   commands: Record<string, Command>;
 }
 
@@ -33,6 +49,12 @@ const TOOLS: Tool[] = [
     id: TOOL_EXA,
     name: 'Exa',
     iconUrl: 'https://exa.ai/images/favicon-32x32.png',
+    package: 'exa-mcp-server',
+    args: null,
+    env: {
+      EXA_API_KEY: '',
+    },
+    enabled: true,
     commands: {
       search: {
         description: 'Search the web using Exa AI',
@@ -47,6 +69,10 @@ const TOOLS: Tool[] = [
     id: TOOL_SEQUENTIAL_THINKING,
     name: 'Sequential Thinking',
     iconUrl: getStaticPath('icons/thinking.svg'),
+    package: '@modelcontextprotocol/server-sequential-thinking',
+    args: null,
+    env: {},
+    enabled: true,
     commands: {
       sequentialthinking: {
         description: 'Thinking sequentially',
@@ -61,6 +87,10 @@ const TOOLS: Tool[] = [
     id: TOOL_FILE_SYSTEM,
     name: 'File System',
     iconUrl: getStaticPath('icons/finder.png'),
+    package: '@modelcontextprotocol/server-filesystem',
+    args: ['/Users/destiner/Desktop', '/Users/destiner/Downloads'],
+    env: {},
+    enabled: true,
     commands: {
       read_file: {
         description:
@@ -140,6 +170,12 @@ const TOOLS: Tool[] = [
     id: TOOL_LINEAR,
     name: 'Linear',
     iconUrl: 'https://linear.app/favicon.ico',
+    package: 'mcp-linear',
+    args: null,
+    env: {
+      LINEAR_API_KEY: '',
+    },
+    enabled: true,
     commands: {
       create_issue: {
         description:
@@ -187,6 +223,12 @@ const TOOLS: Tool[] = [
     id: TOOL_E2B,
     name: 'E2B',
     iconUrl: 'https://e2b.dev/favicon.ico',
+    package: '@e2b/mcp-server',
+    args: null,
+    env: {
+      E2B_API_KEY: '',
+    },
+    enabled: true,
     commands: {
       run_code: {
         description:
@@ -198,7 +240,401 @@ const TOOLS: Tool[] = [
       },
     },
   },
+  {
+    id: TOOL_OBSIDIAN,
+    name: 'Obsidian',
+    iconUrl: 'https://obsidian.md/favicon.ico',
+    package: 'mcp-obsidian',
+    args: [],
+    env: {},
+    enabled: false,
+    commands: {
+      read_notes: {
+        description:
+          "Read the contents of multiple notes. Each note's content is returned with its path as a reference. Failed reads for individual notes won't stop the entire operation. Reading too many at once may result in an error.",
+        actionDescription: {
+          progress: 'Reading notes',
+          done: 'Read notes',
+        },
+      },
+      search_notes: {
+        description:
+          'Searches for a note by its name. The search is case-insensitive and matches partial names. Queries can also be a valid regex. Returns paths of the notes that match the query.',
+        actionDescription: {
+          progress: 'Searching for notes',
+          done: 'Searched for notes',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_BRAVE_SEARCH,
+    name: 'Brave Search',
+    iconUrl: 'https://brave.com/favicon.ico',
+    package: '@modelcontextprotocol/server-brave-search',
+    args: null,
+    env: {
+      BRAVE_API_KEY: '',
+    },
+    enabled: false,
+    commands: {
+      brave_web_search: {
+        description:
+          'Performs a web search using the Brave Search API, ideal for general queries, news, articles, and online content. Supports pagination, content filtering, and freshness controls. Maximum 20 results per request, with offset for pagination.',
+        actionDescription: {
+          progress: 'Searching the web',
+          done: 'Searched the web',
+        },
+      },
+      brave_local_search: {
+        description:
+          "Searches for local businesses and places using Brave's Local Search API. Best for queries related to physical locations, businesses, restaurants, services, etc.",
+        actionDescription: {
+          progress: 'Searching for local data',
+          done: 'Searched for local data',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_YOUTUBE_TRANSCRIPT,
+    name: 'YouTube Transcript',
+    iconUrl: 'https://www.youtube.com/favicon.ico',
+    package: '@kimtaeyoon83/mcp-server-youtube-transcript',
+    args: null,
+    env: {},
+    enabled: false,
+    commands: {
+      get_transcript: {
+        description: 'Extract transcript from a YouTube video URL or ID',
+        actionDescription: {
+          progress: 'Extracting transcript',
+          done: 'Extracted transcript',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_GITHUB,
+    name: 'GitHub',
+    iconUrl: 'https://github.com/favicon.ico',
+    package: '@modelcontextprotocol/server-github',
+    args: null,
+    env: {
+      GITHUB_PERSONAL_ACCESS_TOKEN: '',
+    },
+    enabled: false,
+    commands: {
+      create_or_update_file: {
+        description: 'Create or update a single file in a GitHub repository',
+        actionDescription: {
+          progress: 'Creating a file',
+          done: 'Created a file',
+        },
+      },
+      search_repositories: {
+        description: 'Search for GitHub repositories',
+        actionDescription: {
+          progress: 'Searching for repositories',
+          done: 'Searched for repositories',
+        },
+      },
+      create_repository: {
+        description: 'Create a new GitHub repository in your account',
+        actionDescription: {
+          progress: 'Creating a repository',
+          done: 'Created a repository',
+        },
+      },
+      get_file_contents: {
+        description:
+          'Get the contents of a file or directory from a GitHub repository',
+        actionDescription: {
+          progress: 'Getting file contents',
+          done: 'Got file contents',
+        },
+      },
+      push_files: {
+        description:
+          'Push multiple files to a GitHub repository in a single commit',
+        actionDescription: {
+          progress: 'Pushing files',
+          done: 'Pushed files',
+        },
+      },
+      create_issue: {
+        description: 'Create a new issue in a GitHub repository',
+        actionDescription: {
+          progress: 'Creating an issue',
+          done: 'Created an issue',
+        },
+      },
+      create_pull_request: {
+        description: 'Create a new pull request in a GitHub repository',
+        actionDescription: {
+          progress: 'Creating a pull request',
+          done: 'Created a pull request',
+        },
+      },
+      fork_repository: {
+        description:
+          'Fork a GitHub repository to your account or specified organization',
+        actionDescription: {
+          progress: 'Forking a repository',
+          done: 'Forked a repository',
+        },
+      },
+      create_branch: {
+        description: 'Create a new branch in a GitHub repository',
+        actionDescription: {
+          progress: 'Creating a branch',
+          done: 'Created a branch',
+        },
+      },
+      list_commits: {
+        description: 'Get list of commits of a branch in a GitHub repository',
+        actionDescription: {
+          progress: 'Listing commits',
+          done: 'Listed commits',
+        },
+      },
+      list_issues: {
+        description:
+          'List issues in a GitHub repository with filtering options',
+        actionDescription: {
+          progress: 'Listing issues',
+          done: 'Listed issues',
+        },
+      },
+      update_issue: {
+        description: 'Update an existing issue in a GitHub repository',
+        actionDescription: {
+          progress: 'Updating an issue',
+          done: 'Updated an issue',
+        },
+      },
+      add_issue_comment: {
+        description: 'Add a comment to an existing issue',
+        actionDescription: {
+          progress: 'Adding a comment',
+          done: 'Added a comment',
+        },
+      },
+      search_code: {
+        description: 'Search for code across GitHub repositories',
+        actionDescription: {
+          progress: 'Searching for code',
+          done: 'Searched for code',
+        },
+      },
+      search_issues: {
+        description:
+          'Search for issues and pull requests across GitHub repositories',
+        actionDescription: {
+          progress: 'Searching for issues',
+          done: 'Searched for issues',
+        },
+      },
+      search_users: {
+        description: 'Search for users on GitHub',
+        actionDescription: {
+          progress: 'Searching for users',
+          done: 'Searched for users',
+        },
+      },
+      get_issue: {
+        description: 'Get details of a specific issue in a GitHub repository.',
+        actionDescription: {
+          progress: 'Getting an issue',
+          done: 'Got an issue',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_MEMORY_GRAPH,
+    name: 'Memory Graph',
+    iconUrl: getStaticPath('icons/brain.svg'),
+    package: '@modelcontextprotocol/server-memory',
+    args: null,
+    env: {},
+    enabled: false,
+    commands: {
+      create_entities: {
+        description: 'Create multiple new entities in the knowledge graph',
+        actionDescription: {
+          progress: 'Creating entities',
+          done: 'Created entities',
+        },
+      },
+      create_relations: {
+        description:
+          'Create multiple new relations between entities in the knowledge graph. Relations should be in active voice',
+        actionDescription: {
+          progress: 'Creating relations',
+          done: 'Created relations',
+        },
+      },
+      add_observations: {
+        description:
+          'Add new observations to existing entities in the knowledge graph',
+        actionDescription: {
+          progress: 'Adding observations',
+          done: 'Added observations',
+        },
+      },
+      delete_entities: {
+        description:
+          'Delete multiple entities and their associated relations from the knowledge graph',
+        actionDescription: {
+          progress: 'Deleting entities',
+          done: 'Deleted entities',
+        },
+      },
+      delete_observations: {
+        description:
+          'Delete specific observations from entities in the knowledge graph',
+        actionDescription: {
+          progress: 'Deleting observations',
+          done: 'Deleted observations',
+        },
+      },
+      delete_relations: {
+        description: 'Delete multiple relations from the knowledge graph',
+        actionDescription: {
+          progress: 'Deleting relations',
+          done: 'Deleted relations',
+        },
+      },
+      read_graph: {
+        description: 'Read the entire knowledge graph',
+        actionDescription: {
+          progress: 'Reading graph',
+          done: 'Read graph',
+        },
+      },
+      search_nodes: {
+        description: 'Search for nodes in the knowledge graph based on a query',
+        actionDescription: {
+          progress: 'Searching for nodes',
+          done: 'Searched for nodes',
+        },
+      },
+      open_nodes: {
+        description:
+          'Open specific nodes in the knowledge graph by their names',
+        actionDescription: {
+          progress: 'Opening nodes',
+          done: 'Opened nodes',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_GOOGLE_MAPS,
+    name: 'Google Maps',
+    iconUrl:
+      'https://maps.gstatic.com/mapfiles/maps_lite/pwa/icons/maps15_bnuw3a_round_192x192.png',
+    package: '@modelcontextprotocol/server-google-maps',
+    args: null,
+    env: {
+      GOOGLE_MAPS_API_KEY: '',
+    },
+    enabled: false,
+    commands: {
+      maps_geocode: {
+        description: 'Convert an address into geographic coordinates',
+        actionDescription: {
+          progress: 'Converting address to coordinates',
+          done: 'Converted address to coordinates',
+        },
+      },
+      maps_reverse_geocode: {
+        description: 'Convert coordinates into an address',
+        actionDescription: {
+          progress: 'Converting coordinates to address',
+          done: 'Converted coordinates to address',
+        },
+      },
+      maps_search_places: {
+        description: 'Search for places using Google Places API',
+        actionDescription: {
+          progress: 'Searching for places',
+          done: 'Searched for places',
+        },
+      },
+      maps_place_details: {
+        description: 'Get detailed information about a specific place',
+        actionDescription: {
+          progress: 'Getting place details',
+          done: 'Got place details',
+        },
+      },
+      maps_distance_matrix: {
+        description:
+          'Calculate travel distance and time for multiple origins and destinations',
+        actionDescription: {
+          progress: 'Calculating distance matrix',
+          done: 'Calculated distance matrix',
+        },
+      },
+      maps_elevation: {
+        description: 'Get elevation data for locations on the earth',
+        actionDescription: {
+          progress: 'Getting elevation data',
+          done: 'Got elevation data',
+        },
+      },
+      maps_directions: {
+        description: 'Get directions between two points',
+        actionDescription: {
+          progress: 'Getting directions',
+          done: 'Got directions',
+        },
+      },
+    },
+  },
 ];
+
+async function getTools(): Promise<Tool[]> {
+  return TOOLS;
+}
+
+function enableTool(id: ToolId) {
+  const tool = getToolById(id);
+  if (!tool) {
+    throw new Error(`Tool ${id} not found`);
+  }
+  tool.enabled = true;
+}
+
+function disableTool(id: ToolId) {
+  const tool = getToolById(id);
+  if (!tool) {
+    throw new Error(`Tool ${id} not found`);
+  }
+  tool.enabled = false;
+}
+
+function setToolArgs(id: ToolId, args: string[]) {
+  const tool = getToolById(id);
+  if (!tool) {
+    throw new Error(`Tool ${id} not found`);
+  }
+  tool.args = args;
+}
+
+function setToolEnv(id: ToolId, env: Record<string, string>) {
+  const tool = getToolById(id);
+  if (!tool) {
+    throw new Error(`Tool ${id} not found`);
+  }
+  tool.env = env;
+}
+
+function getToolById(id: ToolId) {
+  return TOOLS.find((tool) => tool.id === id);
+}
 
 function nameToId(name: string) {
   const id = name.split('_')[0];
@@ -208,5 +644,5 @@ function nameToId(name: string) {
   return id;
 }
 
-export { nameToId, TOOLS };
+export { nameToId, getTools, enableTool, disableTool, setToolArgs, setToolEnv };
 export type { ToolId, Tool };

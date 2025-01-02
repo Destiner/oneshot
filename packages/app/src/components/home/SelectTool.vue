@@ -34,7 +34,7 @@
               <Select.ItemText> No tool </Select.ItemText>
             </Select.Item>
             <Select.Item
-              v-for="(tool, index) in tools"
+              v-for="(tool, index) in availableTools"
               :key="index"
               class="item"
               :value="tool.id"
@@ -77,9 +77,12 @@ function handleModelValueUpdate(value: string) {
 }
 
 const tools = computed(() => toolsStore.tools);
+const availableTools = computed(() =>
+  tools.value.filter((tool) => tool.enabled),
+);
 const selectedTool = computed(() =>
   selected.value
-    ? tools.value.find((tool) => tool.id === selected.value)
+    ? availableTools.value.find((tool) => tool.id === selected.value)
     : null,
 );
 </script>

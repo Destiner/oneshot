@@ -7,7 +7,7 @@
       @new-chat="handleNewChat"
     />
     <div class="main">
-      <SidebarHistory
+      <Sidebar
         v-if="withSidebar"
         :chats="chats"
         :selected-chat-index="selectedChatIndex"
@@ -20,8 +20,10 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+
 import Header from '@/components/_app/Header.vue';
-import SidebarHistory from '@/components/_app/SidebarHistory.vue';
+import Sidebar from '@/components/_app/Sidebar.vue';
 import useStore from '@/composables/useStore';
 import useChatsStore, { type Chat } from '@/stores/chats';
 
@@ -31,7 +33,15 @@ const withSidebar = ref(false);
 const title = ref('Home');
 
 const chats = computed(() => chatsStore.chats);
-const selectedChatIndex = computed(() => chatsStore.selectedChatIndex);
+
+const route = useRoute();
+const indexRouteParam = computed(
+  () => route.params.index as string | undefined,
+);
+
+const selectedChatIndex = computed(() =>
+  indexRouteParam.value ? Number.parseInt(indexRouteParam.value) : null,
+);
 
 onMounted(async () => {
   const chats = await store.get<Chat[]>('chats');

@@ -37,6 +37,10 @@ interface Tool {
   id: ToolId;
   name: string;
   iconUrl: string;
+  package: string;
+  args: string[] | null;
+  env: Record<string, string>;
+  enabled: boolean;
   commands: Record<string, Command>;
 }
 
@@ -100,6 +104,22 @@ class ApiService {
   async getTools() {
     const response = await this.client.get('llm/tools');
     return response.json<Tool[]>();
+  }
+
+  async setToolArgs(id: ToolId, args: string[]) {
+    await this.client.put(`llm/tool/${id}/args`, { json: { id, args } });
+  }
+
+  async setToolEnv(id: ToolId, env: Record<string, string>) {
+    await this.client.put(`llm/tool/${id}/env`, { json: { id, env } });
+  }
+
+  async enableTool(id: ToolId) {
+    await this.client.put(`llm/tool/${id}/enable`, { json: { id } });
+  }
+
+  async disableTool(id: ToolId) {
+    await this.client.put(`llm/tool/${id}/disable`, { json: { id } });
   }
 }
 

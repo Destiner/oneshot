@@ -36,7 +36,7 @@
 
 <script setup lang="ts">
 import type Anthropic from '@anthropic-ai/sdk';
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref } from 'vue';
 
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
 import AutoResizeTextarea from '@/components/__common/AutoResizeTextarea.vue';
@@ -68,11 +68,6 @@ const selectedTool = computed(() =>
     : null,
 );
 const tools = computed(() => toolsStore.tools);
-
-onMounted(async () => {
-  const newTools = await api.getTools();
-  toolsStore.setTools(newTools);
-});
 
 function convertMessages(messages: Message[]): Anthropic.MessageParam[] {
   function generateToolUseId() {

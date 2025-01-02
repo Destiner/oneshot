@@ -6,8 +6,7 @@ import { StdioClientTransport } from '@modelcontextprotocol/sdk/client/stdio.js'
 
 import {
   nameToId as toolNameToId,
-  TOOLS,
-  type Tool,
+  getTools,
   type ToolId,
 } from '@/llm/tools.js';
 
@@ -23,73 +22,33 @@ type StreamEvent =
     };
 
 const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
-const exaApiKey = process.env.EXA_API_KEY;
-const linearApiKey = process.env.LINEAR_API_KEY;
-const e2bApiKey = process.env.E2B_API_KEY;
 
 if (!anthropicApiKey) {
   throw new Error('ANTHROPIC_API_KEY is not set');
-}
-if (!exaApiKey) {
-  throw new Error('EXA_API_KEY is not set');
-}
-if (!linearApiKey) {
-  throw new Error('LINEAR_API_KEY is not set');
-}
-if (!e2bApiKey) {
-  throw new Error('E2B_API_KEY is not set');
 }
 
 const anthropic = new Anthropic({
   apiKey: anthropicApiKey,
 });
 
-const exa = new StdioClientTransport({
-  command: 'bunx',
-  args: ['exa-mcp-server'],
-  env: {
-    EXA_API_KEY: exaApiKey,
-    PATH: process.env.PATH as string,
-  },
-});
-const fileSystem = new StdioClientTransport({
-  command: 'bunx',
-  args: [
-    '@modelcontextprotocol/server-filesystem',
-    '/Users/destiner/Desktop',
-    '/Users/destiner/Downloads',
-  ],
-});
-const sequentialThinking = new StdioClientTransport({
-  command: 'bunx',
-  args: ['@modelcontextprotocol/server-sequential-thinking'],
-});
-const linear = new StdioClientTransport({
-  command: 'bunx',
-  args: ['mcp-linear'],
-  env: {
-    LINEAR_API_KEY: linearApiKey,
-    PATH: process.env.PATH as string,
-  },
-});
-const e2b = new StdioClientTransport({
-  command: 'bunx',
-  args: ['@e2b/mcp-server'],
-  env: {
-    E2B_API_KEY: e2bApiKey,
-    PATH: process.env.PATH as string,
-  },
-});
-
 const client = new MultiClient();
-async function init() {
-  await client.connectAll({
-    exa,
-    fileSystem,
-    sequentialThinking,
-    linear,
-    e2b,
-  });
+
+async function reconnect() {
+  const clients: Record<string, StdioClientTransport> = {};
+  const tools = await getTools();
+  for (const tool of tools) {
+    if (!tool.enabled) {
+      continue;
+    }
+    const args = tool.args || [];
+    const client = new StdioClientTransport({
+      command: 'bunx',
+      args: [tool.package, ...args],
+      env: tool.env,
+    });
+    clients[tool.id] = client;
+  }
+  await client.connectAll(clients);
 }
 
 async function streamResponse(
@@ -213,10 +172,6 @@ Expected title: "Home Workout" or "No-Equipment Exercise"`,
   return firstBlock.type === 'text' ? firstBlock.text : '';
 }
 
-async function getTools(): Promise<Tool[]> {
-  return TOOLS;
-}
-
 async function requestStreamCallback(
   model: Model,
   messages: Anthropic.MessageParam[],
@@ -241,7 +196,7 @@ async function requestStreamCallback(
 
 const requestStream = promisify(requestStreamCallback);
 
-init();
+reconnect();
 
-export { streamResponse, getTitle, getTools };
+export { streamResponse, getTitle, reconnect };
 export type { StreamEvent };

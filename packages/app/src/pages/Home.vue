@@ -10,14 +10,23 @@
 
 <script setup lang="ts">
 import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+
 import ChatView from '@/components/home/ChatView.vue';
 import useChatsStore from '@/stores/chats';
 import useStore from '@/composables/useStore';
 
+const route = useRoute();
 const store = useStore();
 const chatsStore = useChatsStore();
 
-const selectedChatIndex = computed(() => chatsStore.selectedChatIndex);
+const indexRouteParam = computed(
+  () => route.params.index as string | undefined,
+);
+
+const selectedChatIndex = computed(() =>
+  indexRouteParam.value ? Number.parseInt(indexRouteParam.value) : 0,
+);
 const selectedChat = computed(() => chatsStore.chats[selectedChatIndex.value]);
 function handleNewMessage() {
   store.set('chats', chatsStore.chats);
