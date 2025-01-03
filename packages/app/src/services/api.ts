@@ -130,6 +130,10 @@ class ApiService {
     return response.json<Tool[]>();
   }
 
+  async setTools(tools: Tool[]) {
+    await this.client.put('llm/tools', { json: { tools } });
+  }
+
   async setToolArgs(id: ToolId, args: string[]) {
     await this.client.put(`llm/tool/${id}/args`, { json: { id, args } });
   }

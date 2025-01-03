@@ -44,7 +44,7 @@ interface Tool {
   commands: Record<string, Command>;
 }
 
-const TOOLS: Tool[] = [
+let tools: Tool[] = [
   {
     id: TOOL_EXA,
     name: 'Exa',
@@ -596,8 +596,12 @@ const TOOLS: Tool[] = [
   },
 ];
 
-async function getTools(): Promise<Tool[]> {
-  return TOOLS;
+function getTools(): Tool[] {
+  return tools;
+}
+
+function setTools(newTools: Tool[]) {
+  tools = newTools;
 }
 
 function enableTool(id: ToolId) {
@@ -633,7 +637,7 @@ function setToolEnv(id: ToolId, env: Record<string, string>) {
 }
 
 function getToolById(id: ToolId) {
-  return TOOLS.find((tool) => tool.id === id);
+  return tools.find((tool) => tool.id === id);
 }
 
 function nameToId(name: string) {
@@ -644,5 +648,13 @@ function nameToId(name: string) {
   return id;
 }
 
-export { nameToId, getTools, enableTool, disableTool, setToolArgs, setToolEnv };
+export {
+  nameToId,
+  getTools,
+  setTools,
+  enableTool,
+  disableTool,
+  setToolArgs,
+  setToolEnv,
+};
 export type { ToolId, Tool };

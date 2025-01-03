@@ -108,6 +108,7 @@ onMounted(async () => {
   const storedTools = await store.get<Tool[]>('tools');
   if (storedTools) {
     toolsStore.setTools(storedTools);
+    await api.setTools(storedTools);
   } else {
     const newTools = await api.getTools();
     toolsStore.setTools(newTools);

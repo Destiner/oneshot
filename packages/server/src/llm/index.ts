@@ -12,6 +12,7 @@ import {
 import {
   type ToolId,
   getTools,
+  setTools,
   enableTool,
   disableTool,
   setToolArgs,
@@ -62,8 +63,14 @@ const route = llm
     return c.text('OK');
   })
   .get('/tools', async (c) => {
-    const tools = await getTools();
+    const tools = getTools();
     return c.json(tools);
+  })
+  .put('/tools', async (c) => {
+    const { tools } = await c.req.json();
+    setTools(tools);
+    await reconnect();
+    return c.text('OK');
   })
   .put('/tool/:id/enable', async (c) => {
     const { id } = c.req.param();

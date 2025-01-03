@@ -31,7 +31,7 @@
           <input
             id="api-key"
             :value="provider.apiKey"
-            type="text"
+            type="password"
             @input="handleApiKeyInput(provider.id, $event)"
           />
         </form>
@@ -60,6 +60,9 @@ onMounted(async () => {
   const storedProviders = await store.get<Provider[]>('providers');
   if (storedProviders && storedProviders.length > 0) {
     providersStore.setProviders(storedProviders);
+    for (const provider of providers.value) {
+      await api.setProviderApiKey(provider.id, provider.apiKey);
+    }
   } else {
     const newProviders = await api.getProviders();
     providersStore.setProviders(newProviders);
