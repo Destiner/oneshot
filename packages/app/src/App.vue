@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 import Header from '@/components/_app/Header.vue';
@@ -30,15 +30,17 @@ import ApiService, { type Provider, type Tool } from '@/services/api';
 import useChatsStore, { type Chat } from '@/stores/chats';
 import useToolsStore from '@/stores/tools';
 import useProvidersStore from '@/stores/providers';
+import useUiStore from '@/stores/ui';
 
 const { apiBaseUrl } = useEnv();
 const store = useStore();
 const chatsStore = useChatsStore();
 const providersStore = useProvidersStore();
 const toolsStore = useToolsStore();
+const uiStore = useUiStore();
 const withSidebar = ref(false);
-const title = ref('Home');
 
+const title = computed(() => uiStore.title);
 const chats = computed(() => chatsStore.chats);
 const tools = computed(() => toolsStore.tools);
 const providers = computed(() => providersStore.providers);

@@ -41,20 +41,26 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, onMounted } from 'vue';
 
 import useEnv from '@/composables/useEnv';
 import useStore from '@/composables/useStore';
 import ApiService from '@/services/api';
 import useProvidersStore from '@/stores/providers';
+import useUiStore from '@/stores/ui';
 
 const { apiBaseUrl } = useEnv();
 const providersStore = useProvidersStore();
 const store = useStore();
+const uiStore = useUiStore();
 
 const api = new ApiService(apiBaseUrl);
 
 const providers = computed(() => providersStore.providers);
+
+onMounted(() => {
+  uiStore.setTitle('Providers');
+});
 
 async function handleApiKeyInput(providerId: string, event: Event) {
   const target = event.target as HTMLInputElement;

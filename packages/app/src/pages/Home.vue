@@ -9,16 +9,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed, watch } from 'vue';
 import { useRoute } from 'vue-router';
 
 import ChatView from '@/components/home/ChatView.vue';
 import useChatsStore from '@/stores/chats';
 import useStore from '@/composables/useStore';
+import useUiStore from '@/stores/ui';
 
 const route = useRoute();
 const store = useStore();
 const chatsStore = useChatsStore();
+const uiStore = useUiStore();
 
 const indexRouteParam = computed(
   () => route.params.index as string | undefined,
@@ -31,6 +33,18 @@ const selectedChat = computed(() => chatsStore.chats[selectedChatIndex.value]);
 function handleNewMessage() {
   store.set('chats', chatsStore.chats);
 }
+
+watch(
+  selectedChat,
+  (newChat) => {
+    if (newChat?.title) {
+      uiStore.setTitle(newChat.title);
+    }
+  },
+  {
+    immediate: true,
+  },
+);
 </script>
 
 <style scoped>
