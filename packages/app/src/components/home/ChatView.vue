@@ -119,24 +119,24 @@ function convertMessages(messages: Message[]): Anthropic.MessageParam[] {
 }
 
 async function send() {
+  const promptValue = prompt.value;
+  prompt.value = '';
   chat.messages.push({
     role: 'user',
-    content: [{ type: 'text', text: prompt.value }],
+    content: [{ type: 'text', text: promptValue }],
   });
-  prompt.value = '';
-
-  requestTitle();
+  requestTitle(promptValue);
   const tools = selectedTool.value ? [selectedTool.value.id] : [];
   await request(tools);
   emit('new-message');
 }
 
-async function requestTitle() {
+async function requestTitle(prompt: string) {
   // Only request once
   if (chat.title) {
     return;
   }
-  const response = await api.getTitle(convertMessages(chat.messages));
+  const response = await api.getTitle(prompt);
   chat.title = response.title;
 }
 

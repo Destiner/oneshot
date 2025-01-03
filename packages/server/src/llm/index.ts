@@ -45,8 +45,8 @@ const route = llm
     });
   })
   .post('/chat/title', async (c) => {
-    const { messages } = await c.req.json();
-    const title = await getTitle(messages);
+    const { message } = await c.req.json();
+    const title = await getTitle(message);
     return c.json({ title });
   })
   .get('/providers', async (c) => {

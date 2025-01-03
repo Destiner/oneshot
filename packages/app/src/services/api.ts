@@ -109,9 +109,9 @@ class ApiService {
     }
   }
 
-  async getTitle(messages: Anthropic.MessageParam[]) {
+  async getTitle(message: string) {
     const response = await this.client.post('llm/chat/title', {
-      json: { messages },
+      json: { message },
     });
     return response.json<{ title: string }>();
   }

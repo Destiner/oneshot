@@ -28,7 +28,7 @@ const client = new MultiClient();
 
 async function reconnect() {
   const clients: Record<string, StdioClientTransport> = {};
-  const tools = await getTools();
+  const tools = getTools();
   for (const tool of tools) {
     if (!tool.enabled) {
       continue;
@@ -141,44 +141,22 @@ async function streamResponse(
   }
 }
 
-async function getTitle(messages: Anthropic.MessageParam[]) {
-  const anthropicMessages: Anthropic.MessageParam[] = messages.map((msg) => ({
-    role: msg.role as Anthropic.MessageParam['role'],
-    content: msg.content,
-  }));
-
+async function getTitle(message: string) {
   const response = await anthropic.messages.create({
     model: 'claude-3-5-haiku-latest',
     max_tokens: 1024,
-    system: `
-Give a short title for the chat below. Do not output anything else. Prefer 3-5 words. Don't paraphrase the words in the chat unless absolutely necessary. 
+    system: 'You provide short titles for user messages.',
+    messages: [
+      {
+        role: 'user',
+        content: `
+      Give a short title for the message below. Do not output anything else. Prefer 3-5 words.
       
-Some examples:
-      
-1. User: "How do I prepare a traditional Italian carbonara from scratch?"
-Expected title: "Carbonara Recipe" or "Italian Cooking"
-
-2. User: "What are the main differences between Python and JavaScript?"
-Expected title: "Python vs JavaScript" or "Programming Language Comparison"
-
-3. User: "My cat has been sleeping more than usual lately. Should I be worried?"
-Expected title: "Cat Health Concerns" or "Pet Behavior"
-
-4. User: "Can you help me understand quantum entanglement in simple terms?"
-Expected title: "Quantum Physics Basics" or "Understanding Entanglement"
-
-5. User: "I need tips for negotiating a salary for my first job."
-Expected title: "Salary Negotiation" or "Career Advice"
-
-6. User: "What's causing the current conflict between Country A and Country B?"
-Expected title: "Geopolitical Conflict Analysis" or "International Relations"
-
-7. User: "How can I improve my landscape photography skills?"
-Expected title: "Photography Tips" or "Landscape Photo Guide"
-
-8. User: "What are some exercises I can do at home without any equipment?"
-Expected title: "Home Workout" or "No-Equipment Exercise"`,
-    messages: anthropicMessages,
+      Message text:
+      ${message}
+      `,
+      },
+    ],
   });
 
   const content = response.content;
