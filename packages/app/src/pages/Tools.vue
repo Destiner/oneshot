@@ -86,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue';
+import { computed } from 'vue';
 
 import OneSwitch from '@/components/__common/OneSwitch.vue';
 import IconMinus from '@/components/__common/IconMinus.vue';
@@ -94,7 +94,7 @@ import IconPlus from '@/components/__common/IconPlus.vue';
 import useEnv from '@/composables/useEnv';
 import useStore from '@/composables/useStore';
 import useToolsStore from '@/stores/tools';
-import ApiService, { type Tool, type ToolId } from '@/services/api';
+import ApiService, { type ToolId } from '@/services/api';
 
 const { apiBaseUrl } = useEnv();
 const toolsStore = useToolsStore();
@@ -103,18 +103,6 @@ const store = useStore();
 const api = new ApiService(apiBaseUrl);
 
 const tools = computed(() => toolsStore.tools);
-
-onMounted(async () => {
-  const storedTools = await store.get<Tool[]>('tools');
-  if (storedTools) {
-    toolsStore.setTools(storedTools);
-    await api.setTools(storedTools);
-  } else {
-    const newTools = await api.getTools();
-    toolsStore.setTools(newTools);
-    save();
-  }
-});
 
 async function toggleTool(id: ToolId) {
   const tool = tools.value.find((tool) => tool.id === id);

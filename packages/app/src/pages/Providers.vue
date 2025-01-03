@@ -41,11 +41,11 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, computed } from 'vue';
+import { computed } from 'vue';
 
 import useEnv from '@/composables/useEnv';
 import useStore from '@/composables/useStore';
-import ApiService, { type Provider } from '@/services/api';
+import ApiService from '@/services/api';
 import useProvidersStore from '@/stores/providers';
 
 const { apiBaseUrl } = useEnv();
@@ -55,24 +55,6 @@ const store = useStore();
 const api = new ApiService(apiBaseUrl);
 
 const providers = computed(() => providersStore.providers);
-
-onMounted(async () => {
-  const storedProviders = await store.get<Provider[]>('providers');
-  if (storedProviders && storedProviders.length > 0) {
-    providersStore.setProviders(storedProviders);
-    for (const provider of providers.value) {
-      await api.setProviderApiKey(provider.id, provider.apiKey);
-    }
-  } else {
-    const newProviders = await api.getProviders();
-    providersStore.setProviders(newProviders);
-    save();
-  }
-});
-
-async function save() {
-  store.set('providers', providers.value);
-}
 
 async function handleApiKeyInput(providerId: string, event: Event) {
   const target = event.target as HTMLInputElement;
@@ -85,6 +67,10 @@ async function handleApiKeyInput(providerId: string, event: Event) {
   provider.apiKey = target.value;
   await api.setProviderApiKey(provider.id, target.value);
   save();
+}
+
+async function save() {
+  store.set('providers', providers.value);
 }
 </script>
 
