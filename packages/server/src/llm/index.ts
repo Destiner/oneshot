@@ -6,6 +6,8 @@ import {
   streamResponse,
   getTitle,
   reconnect,
+  setApiKey,
+  getProvider as getAnthropicProvider,
 } from './anthropic/index.js';
 import {
   type ToolId,
@@ -43,10 +45,21 @@ const route = llm
   })
   .post('/chat/title', async (c) => {
     const { messages } = await c.req.json();
-
     const title = await getTitle(messages);
-
     return c.json({ title });
+  })
+  .get('/providers', async (c) => {
+    const anthropic = await getAnthropicProvider();
+    return c.json([anthropic]);
+  })
+  .put('/provider/:provider/key', async (c) => {
+    const { provider } = c.req.param();
+    const { key } = await c.req.json();
+    if (provider !== 'anthropic') {
+      return c.text('Provider is not supported', 400);
+    }
+    await setApiKey(key);
+    return c.text('OK');
   })
   .get('/tools', async (c) => {
     const tools = await getTools();
@@ -56,27 +69,27 @@ const route = llm
     const { id } = c.req.param();
     enableTool(id as ToolId);
     await reconnect();
-    return c.json({ id });
+    return c.text('OK');
   })
   .put('/tool/:id/disable', async (c) => {
     const { id } = c.req.param();
     disableTool(id as ToolId);
     await reconnect();
-    return c.json({ id });
+    return c.text('OK');
   })
   .put('/tool/:id/args', async (c) => {
     const { id } = c.req.param();
     const { args } = await c.req.json();
     setToolArgs(id as ToolId, args);
     await reconnect();
-    return c.json({ id });
+    return c.text('OK');
   })
   .put('/tool/:id/env', async (c) => {
     const { id } = c.req.param();
     const { env } = await c.req.json();
     setToolEnv(id as ToolId, env);
     await reconnect();
-    return c.json({ id });
+    return c.text('OK');
   });
 
 type Route = typeof route;

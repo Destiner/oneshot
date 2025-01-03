@@ -1,7 +1,6 @@
 import ky, { type KyInstance } from 'ky';
 
 import type Anthropic from '@anthropic-ai/sdk';
-import type { Model } from '@/stores/chats';
 
 type StreamEvent =
   | Anthropic.Messages.RawMessageStreamEvent
@@ -44,6 +43,22 @@ interface Tool {
   commands: Record<string, Command>;
 }
 
+type ModelId = 'claude-3-5-sonnet-latest' | 'claude-3-5-haiku-latest';
+
+interface Model {
+  id: ModelId;
+  name: string;
+  description: string;
+}
+
+interface Provider {
+  id: string;
+  name: string;
+  iconUrl: string;
+  apiKey: string;
+  models: Model[];
+}
+
 class ApiService {
   client: KyInstance;
 
@@ -54,7 +69,7 @@ class ApiService {
   }
 
   async streamLlmChatResponse(
-    model: Model,
+    model: ModelId,
     messages: Anthropic.MessageParam[],
     tools: ToolId[],
     onEvent: (event: StreamEvent) => void,
@@ -101,6 +116,15 @@ class ApiService {
     return response.json<{ title: string }>();
   }
 
+  async getProviders() {
+    const response = await this.client.get('llm/providers');
+    return response.json<Provider[]>();
+  }
+
+  async setProviderApiKey(provider: string, key: string) {
+    await this.client.put(`llm/provider/${provider}/key`, { json: { key } });
+  }
+
   async getTools() {
     const response = await this.client.get('llm/tools');
     return response.json<Tool[]>();
@@ -124,4 +148,4 @@ class ApiService {
 }
 
 export default ApiService;
-export type { Tool, ToolId };
+export type { Tool, ToolId, Model, ModelId, Provider };

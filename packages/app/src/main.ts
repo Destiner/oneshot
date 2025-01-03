@@ -5,6 +5,7 @@ import { createPinia } from 'pinia';
 import App from './App.vue';
 import Home from './pages/Home.vue';
 import Tools from './pages/Tools.vue';
+import Providers from './pages/Providers.vue';
 
 const app = createApp(App);
 const pinia = createPinia();
@@ -13,6 +14,7 @@ const router = createRouter({
   routes: [
     { path: '/:index', component: Home },
     { path: '/tools', component: Tools },
+    { path: '/providers', component: Providers },
   ],
 });
 

@@ -65,8 +65,7 @@
             </div>
           </div>
           <div class="env">
-            <div
-              class="env-var"
+            <form
               v-for="(envValue, envKey) in tool.env"
               :key="envKey"
             >
@@ -75,9 +74,10 @@
                 :id="envKey"
                 :value="envValue"
                 placeholder="Value"
+                type="password"
                 @input="handleEnvInput(tool.id, envKey, $event)"
               />
-            </div>
+            </form>
           </div>
         </div>
       </div>

@@ -1,21 +1,30 @@
 <template>
   <div class="root">
     <div class="list">
-      <div
+      <RouterLink
         v-for="(chat, index) in orderedChats"
         :key="index"
         class="item"
-        :class="{ selected: isSelected(index) }"
+        :to="`/${getReverseIndex(index)}`"
       >
-        <RouterLink :to="`/${getReverseIndex(index)}`">
+        <div>
           {{ chat.title ?? 'New Chat' }}
-        </RouterLink>
-      </div>
+        </div>
+      </RouterLink>
     </div>
     <div class="options">
-      <div class="option">
-        <RouterLink to="/tools">Tools</RouterLink>
-      </div>
+      <RouterLink
+        to="/tools"
+        class="item"
+      >
+        Tools
+      </RouterLink>
+      <RouterLink
+        to="/providers"
+        class="item"
+      >
+        Providers
+      </RouterLink>
     </div>
   </div>
 </template>
@@ -52,8 +61,10 @@ function getReverseIndex(index: number) {
   justify-content: space-between;
   width: 250px;
   padding: 8px;
+  overflow-y: scroll;
   border-right: 1px solid #000;
   background: #2d2f2f;
+  gap: 32px;
 }
 
 .list {
@@ -65,15 +76,12 @@ function getReverseIndex(index: number) {
 .item {
   padding: 8px;
   border-radius: 4px;
+  color: inherit;
+  text-decoration: none;
   cursor: default;
 
-  &.selected {
+  &.router-link-active {
     background: #5d5e5e;
-  }
-
-  a {
-    color: inherit;
-    text-decoration: none;
   }
 }
 
@@ -84,7 +92,6 @@ function getReverseIndex(index: number) {
 }
 
 .option {
-  padding: 8px;
   border-radius: 4px;
   cursor: default;
 

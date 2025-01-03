@@ -1,9 +1,8 @@
-import type { ToolId } from '@/services/api';
+import type { ToolId, ModelId } from '@/services/api';
 import { defineStore } from 'pinia';
 import { ref } from 'vue';
 
 type Message = UserMessage | AssistantMessage;
-type Model = 'claude-3-5-sonnet-latest' | 'claude-3-5-haiku-latest';
 
 interface TextContent {
   type: 'text';
@@ -27,7 +26,7 @@ interface UserMessage {
 
 interface AssistantMessage {
   role: 'assistant';
-  model: Model;
+  model: ModelId;
   content: MessageContent[];
   inProgress: boolean;
   isError: boolean;
@@ -55,4 +54,4 @@ const useStore = defineStore('chats', () => {
 });
 
 export default useStore;
-export type { Chat, Model, Message, TextContent, ToolContent };
+export type { Chat, ModelId as Model, Message, TextContent, ToolContent };

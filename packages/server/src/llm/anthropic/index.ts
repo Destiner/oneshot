@@ -9,8 +9,7 @@ import {
   getTools,
   type ToolId,
 } from '@/llm/tools.js';
-
-type Model = 'claude-3-5-sonnet-latest' | 'claude-3-5-haiku-latest';
+import type { ModelId, Model, Provider } from '@/llm/providers.js';
 
 type StreamEvent =
   | Anthropic.Messages.RawMessageStreamEvent
@@ -21,14 +20,8 @@ type StreamEvent =
       result: string;
     };
 
-const anthropicApiKey = process.env.ANTHROPIC_API_KEY;
-
-if (!anthropicApiKey) {
-  throw new Error('ANTHROPIC_API_KEY is not set');
-}
-
 const anthropic = new Anthropic({
-  apiKey: anthropicApiKey,
+  apiKey: '',
 });
 
 const client = new MultiClient();
@@ -51,8 +44,33 @@ async function reconnect() {
   await client.connectAll(clients);
 }
 
+async function getProvider(): Promise<Provider> {
+  return {
+    id: 'anthropic',
+    name: 'Anthropic',
+    iconUrl: 'https://anthropic.com/favicon.ico',
+    apiKey: '',
+    models: [
+      {
+        id: 'claude-3-5-sonnet-latest',
+        name: 'Claude 3.5 Sonnet',
+        description: 'Smart and powerful',
+      },
+      {
+        id: 'claude-3-5-haiku-latest',
+        name: 'Claude 3.5 Haiku',
+        description: 'Fast and efficient',
+      },
+    ],
+  };
+}
+
+async function setApiKey(key: string) {
+  anthropic.apiKey = key;
+}
+
 async function streamResponse(
-  model: Model,
+  model: ModelId,
   messages: Anthropic.MessageParam[],
   tools: ToolId[],
   onEvent: (event: StreamEvent) => Promise<void>,
@@ -173,7 +191,7 @@ Expected title: "Home Workout" or "No-Equipment Exercise"`,
 }
 
 async function requestStreamCallback(
-  model: Model,
+  model: ModelId,
   messages: Anthropic.MessageParam[],
   tools: Anthropic.Messages.Tool[],
   onEvent: (event: Anthropic.MessageStreamEvent) => void,
@@ -196,7 +214,5 @@ async function requestStreamCallback(
 
 const requestStream = promisify(requestStreamCallback);
 
-reconnect();
-
-export { streamResponse, getTitle, reconnect };
+export { streamResponse, getTitle, setApiKey, reconnect, getProvider };
 export type { StreamEvent };
