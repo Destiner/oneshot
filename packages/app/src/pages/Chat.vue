@@ -29,7 +29,10 @@ const indexRouteParam = computed(
 const selectedChatIndex = computed(() =>
   indexRouteParam.value ? Number.parseInt(indexRouteParam.value) : 0,
 );
-const selectedChat = computed(() => chatsStore.chats[selectedChatIndex.value]);
+const chats = computed(() => chatsStore.chats);
+const selectedChat = computed(
+  () => chats.value[chats.value.length - selectedChatIndex.value - 1],
+);
 function handleNewMessage() {
   store.set('chats', chatsStore.chats);
 }

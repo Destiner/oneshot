@@ -9,9 +9,7 @@
     <div class="main">
       <Sidebar
         v-if="withSidebar"
-        :chats="chats"
-        :selected-chat-index="selectedChatIndex"
-        @select-chat="handleSelectChat"
+        :chats="orderedChats"
       />
       <RouterView />
     </div>
@@ -19,8 +17,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, watch } from 'vue';
-import { useRoute } from 'vue-router';
+import { ref, computed, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 
 import Header from '@/components/_app/Header.vue';
 import Sidebar from '@/components/_app/Sidebar.vue';
@@ -45,16 +43,7 @@ const chats = computed(() => chatsStore.chats);
 const tools = computed(() => toolsStore.tools);
 const providers = computed(() => providersStore.providers);
 
-const route = useRoute();
-const indexRouteParam = computed(
-  () => route.params.index as string | undefined,
-);
-
 const api = new ApiService(apiBaseUrl);
-
-const selectedChatIndex = computed(() =>
-  indexRouteParam.value ? Number.parseInt(indexRouteParam.value) : null,
-);
 
 onMounted(async () => {
   const chats = await store.get<Chat[]>('chats');
@@ -89,15 +78,19 @@ function handleToggleSidebar() {
   withSidebar.value = !withSidebar.value;
 }
 
+// Reverse the order of the chats
+const orderedChats = computed(() => {
+  const chatCopy = [...chats.value];
+  return chatCopy.reverse();
+});
+
+const router = useRouter();
 function handleNewChat() {
   chatsStore.chats.push({
     title: null,
     messages: [],
   });
-}
-
-function handleSelectChat(index: number) {
-  chatsStore.setSelectedChatIndex(index);
+  router.push('/chat/0');
 }
 </script>
 

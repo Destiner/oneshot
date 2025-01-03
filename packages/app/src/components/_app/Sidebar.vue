@@ -2,10 +2,10 @@
   <div class="root">
     <div class="list">
       <RouterLink
-        v-for="(chat, index) in orderedChats"
+        v-for="(chat, index) in chats"
         :key="index"
         class="item"
-        :to="`/${getReverseIndex(index)}`"
+        :to="`/chat/${index}`"
       >
         <div>
           {{ chat.title ?? 'New Chat' }}
@@ -30,28 +30,11 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-
 import type { Chat } from '@/stores/chats';
 
-const { chats, selectedChatIndex } = defineProps<{
+const { chats } = defineProps<{
   chats: Chat[];
-  selectedChatIndex: number | null;
 }>();
-
-// Reverse the order of the chats
-const orderedChats = computed(() => {
-  const chatCopy = [...chats];
-  return chatCopy.reverse();
-});
-
-function isSelected(index: number) {
-  return getReverseIndex(index) === selectedChatIndex;
-}
-
-function getReverseIndex(index: number) {
-  return orderedChats.value.length - index - 1;
-}
 </script>
 
 <style scoped>

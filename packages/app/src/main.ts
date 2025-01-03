@@ -3,7 +3,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import { createPinia } from 'pinia';
 
 import App from './App.vue';
-import Home from './pages/Home.vue';
+import Chat from './pages/Chat.vue';
 import Tools from './pages/Tools.vue';
 import Providers from './pages/Providers.vue';
 
@@ -12,7 +12,8 @@ const pinia = createPinia();
 const router = createRouter({
   history: createWebHistory(),
   routes: [
-    { path: '/:index', component: Home },
+    { path: '/', redirect: '/chat/0' },
+    { path: '/chat/:index', component: Chat },
     { path: '/tools', component: Tools },
     { path: '/providers', component: Providers },
   ],
