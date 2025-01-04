@@ -105,7 +105,6 @@ async function streamResponse(
         const errorText = Number.isNaN(Number(errorCode))
           ? errorMessage
           : errorMessage.substring(errorCode.length);
-        console.log('error 4', errorText);
         if (!errorText) {
           return;
         }
