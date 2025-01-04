@@ -9,7 +9,7 @@ import {
   getTools,
   type ToolId,
 } from '@/llm/tools.js';
-import type { ModelId, Model, Provider } from '@/llm/providers.js';
+import type { ModelId, Provider } from '@/llm/providers.js';
 
 type StreamEvent =
   | Anthropic.Messages.RawMessageStreamEvent
@@ -97,11 +97,18 @@ async function streamResponse(
       },
       (e) => {
         const errorMessage = e.message;
-        const errorCode = errorMessage.split(' ')[0];
+        const errorMessageTokens = errorMessage.split(' ');
+        const errorCode = errorMessageTokens[0];
         if (!errorCode) {
           return;
         }
-        const errorText = errorMessage.substring(errorCode.length);
+        const errorText = Number.isNaN(Number(errorCode))
+          ? errorMessage
+          : errorMessage.substring(errorCode.length);
+        console.log('error 4', errorText);
+        if (!errorText) {
+          return;
+        }
         const error = JSON.parse(errorText) as Anthropic.ErrorResponse;
         onEvent(error);
       },
