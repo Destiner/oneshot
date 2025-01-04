@@ -4,18 +4,22 @@
     ref="rootEl"
     @scroll="handleScroll"
   >
-    <ChatMessageGroup
-      v-for="(group, index) in groupedMessages"
-      :key="index"
-      :group="group"
-    />
+    <TransitionGroup name="list">
+      <ChatMessageGroup
+        v-for="(group, index) in groupedMessages"
+        :key="index"
+        :group="group"
+      />
+    </TransitionGroup>
     <div ref="bottomEl" />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, nextTick, useTemplateRef, ref, watch } from 'vue';
+
 import type { Message, Model } from '@/stores/chats';
+
 import ChatMessageGroup from './ChatMessageGroup.vue';
 
 const { messages } = defineProps<{
@@ -112,5 +116,16 @@ const groupedMessages = computed<Message[][]>(() => {
   padding: 16px;
   overflow-y: scroll;
   gap: 24px;
+}
+
+.list-enter-active,
+.list-leave-active {
+  transition: all 0.5s ease;
+}
+
+.list-enter-from,
+.list-leave-to {
+  transform: translateY(16px);
+  opacity: 0;
 }
 </style>

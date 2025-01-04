@@ -2,6 +2,7 @@
   <div class="content">
     <ChatView
       v-if="selectedChat"
+      :key="indexRouteParam"
       :chat="selectedChat"
       @new-message="handleNewMessage"
     />

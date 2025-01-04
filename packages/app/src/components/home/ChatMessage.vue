@@ -50,15 +50,13 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
-  message: Message;
-}>();
-</script>
-
-<script lang="ts">
 import type { Message } from '@/stores/chats';
 
 import ToolHeader from './ToolHeader.vue';
+
+defineProps<{
+  message: Message;
+}>();
 </script>
 
 <style scoped>
