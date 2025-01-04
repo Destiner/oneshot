@@ -11,7 +11,7 @@
       <IconClaude
         v-else
         class="icon"
-        :class="{ 'in-progress': latestMessage.inProgress }"
+        :class="{ 'in-progress': isInProgress }"
       />
     </div>
     <div class="content">
@@ -62,6 +62,19 @@ const roleName = computed(() => {
       return 'Claude Haiku 3.5';
   }
 });
+
+const isInProgress = computed(() => {
+  if (!latestMessage.value) {
+    return false;
+  }
+  if (latestMessage.value.role === 'user') {
+    return false;
+  }
+  const isToolCalling = latestMessage.value.content.some(
+    (content) => content.type === 'tool',
+  );
+  return latestMessage.value.inProgress || isToolCalling;
+});
 </script>
 
 <style scoped>
@@ -86,8 +99,17 @@ const roleName = computed(() => {
 }
 
 .icon.in-progress {
-  transition: opacity 0.5s ease-in-out;
-  opacity: 0.5;
+  animation: pulse 1s ease-in-out alternate infinite;
+}
+
+@keyframes pulse {
+  from {
+    opacity: 0.4;
+  }
+
+  to {
+    opacity: 0.8;
+  }
 }
 
 .content {
