@@ -28,7 +28,6 @@ interface AssistantMessage {
   role: 'assistant';
   model: ModelId;
   content: MessageContent[];
-  inProgress: boolean;
   isError: boolean;
 }
 

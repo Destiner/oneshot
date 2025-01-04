@@ -2,6 +2,7 @@
   <div class="root">
     <ChatMessages
       :messages="chat.messages"
+      :is-responding="isResponding"
       ref="messagesEl"
     />
     <div class="composer">
@@ -150,8 +151,10 @@ async function requestTitle(prompt: string) {
   chat.title = response.title;
 }
 
+const isResponding = ref(false);
 async function request(tools: ToolId[]) {
   const model = 'claude-3-5-sonnet-latest';
+  isResponding.value = true;
   await api.streamLlmChatResponse(
     model,
     convertMessages(chat.messages),
@@ -163,7 +166,6 @@ async function request(tools: ToolId[]) {
           role: event.message.role,
           model,
           content: event.message.content as TextContent[],
-          inProgress: true,
           isError: false,
         });
       } else if (event.type === 'content_block_start') {
@@ -197,14 +199,6 @@ async function request(tools: ToolId[]) {
             latestContentBlock.input += event.delta.partial_json;
           }
         }
-      } else if (event.type === 'message_stop') {
-        const latestAssistantMessage = chat.messages.findLast(
-          (message) => message.role === 'assistant',
-        );
-        if (!latestAssistantMessage) {
-          return;
-        }
-        latestAssistantMessage.inProgress = false;
       } else if (event.type === 'tool_result') {
         const latestMessage = chat.messages[chat.messages.length - 1];
         if (!latestMessage) return;
@@ -215,22 +209,16 @@ async function request(tools: ToolId[]) {
           latestContentBlock.output = event.result;
         }
       } else if (event.type === 'error') {
-        const latestAssistantMessage = chat.messages.findLast(
-          (message) => message.role === 'assistant',
-        );
-        if (latestAssistantMessage) {
-          latestAssistantMessage.inProgress = false;
-        }
         chat.messages.push({
           role: 'assistant',
           model,
           content: [{ type: 'text', text: event.error.message }],
-          inProgress: false,
           isError: true,
         });
       }
     },
   );
+  isResponding.value = false;
 }
 
 function getToolId(name: string) {

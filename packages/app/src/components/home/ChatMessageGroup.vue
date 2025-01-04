@@ -11,7 +11,7 @@
       <IconClaude
         v-else
         class="icon"
-        :class="{ 'in-progress': isInProgress }"
+        :class="{ 'in-progress': isResponding }"
       />
     </div>
     <div class="content">
@@ -40,8 +40,9 @@ import IconPerson from '@/components/__common/IconPerson.vue';
 import type { Message } from '@/stores/chats';
 import ChatMessage from './ChatMessage.vue';
 
-const { group } = defineProps<{
+const { group, isResponding } = defineProps<{
   group: Message[];
+  isResponding: boolean;
 }>();
 
 const latestMessage = computed(() => {
@@ -61,19 +62,6 @@ const roleName = computed(() => {
     case 'claude-3-5-haiku-latest':
       return 'Claude Haiku 3.5';
   }
-});
-
-const isInProgress = computed(() => {
-  if (!latestMessage.value) {
-    return false;
-  }
-  if (latestMessage.value.role === 'user') {
-    return false;
-  }
-  const isToolCalling = latestMessage.value.content.some(
-    (content) => content.type === 'tool',
-  );
-  return latestMessage.value.inProgress || isToolCalling;
 });
 </script>
 

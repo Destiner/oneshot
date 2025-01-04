@@ -8,7 +8,8 @@
       <ChatMessageGroup
         v-for="(group, index) in groupedMessages"
         :key="index"
-        :group="group"
+        :group
+        :is-responding
       />
     </TransitionGroup>
     <div ref="bottomEl" />
@@ -22,8 +23,9 @@ import type { Message, Model } from '@/stores/chats';
 
 import ChatMessageGroup from './ChatMessageGroup.vue';
 
-const { messages } = defineProps<{
+const { messages, isResponding } = defineProps<{
   messages: Message[];
+  isResponding: boolean;
 }>();
 
 const rootEl = useTemplateRef<HTMLDivElement>('rootEl');
