@@ -12,7 +12,7 @@
           v-if="part.type === 'text'"
           class="text"
         >
-          {{ part.text }}
+          {{ trimWhitespace(part.text) }}
         </div>
         <div
           class="tool-call"
@@ -57,6 +57,10 @@ import ToolHeader from './ToolHeader.vue';
 defineProps<{
   message: Message;
 }>();
+
+function trimWhitespace(text: string) {
+  return text.trimStart();
+}
 </script>
 
 <style scoped>
