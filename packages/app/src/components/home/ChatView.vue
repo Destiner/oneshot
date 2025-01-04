@@ -7,6 +7,7 @@
     <div class="composer">
       <form @submit.prevent="send">
         <AutoResizeTextarea
+          ref="el"
           v-model="prompt"
           placeholder="Ask anything…"
           @keydown.enter.exact.prevent="send"
@@ -36,7 +37,7 @@
 
 <script setup lang="ts">
 import type Anthropic from '@anthropic-ai/sdk';
-import { computed, ref } from 'vue';
+import { computed, ref, onMounted, useTemplateRef } from 'vue';
 
 import IconPaperplane from '@/components/__common/IconPaperplane.vue';
 import AutoResizeTextarea from '@/components/__common/AutoResizeTextarea.vue';
@@ -68,6 +69,15 @@ const selectedTool = computed(() =>
     : null,
 );
 const tools = computed(() => toolsStore.tools);
+
+const textareaRef =
+  useTemplateRef<InstanceType<typeof AutoResizeTextarea>>('el');
+
+onMounted(() => {
+  if (textareaRef.value) {
+    textareaRef.value.focus();
+  }
+});
 
 function convertMessages(messages: Message[]): Anthropic.MessageParam[] {
   function generateToolUseId() {

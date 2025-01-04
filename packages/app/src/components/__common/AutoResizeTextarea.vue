@@ -1,6 +1,6 @@
 <template>
   <textarea
-    ref="textareaRef"
+    ref="el"
     :value="modelValue"
     :placeholder="placeholder"
     @input="handleInput"
@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, nextTick } from 'vue';
+import { onMounted, watch, nextTick, useTemplateRef } from 'vue';
 
 const modelValue = defineModel<string>();
 
@@ -25,7 +25,7 @@ const {
 
 const emit = defineEmits(['update:modelValue']);
 
-const textareaRef = ref<HTMLTextAreaElement | null>(null);
+const rootRef = useTemplateRef<HTMLTextAreaElement>('el');
 
 watch(
   () => modelValue.value,
@@ -44,7 +44,7 @@ function handleInput(e: Event) {
 }
 
 function adjustHeight() {
-  const textarea = textareaRef.value;
+  const textarea = rootRef.value;
   if (!textarea) {
     return;
   }
@@ -61,6 +61,10 @@ function adjustHeight() {
   const newHeight = Math.min(Math.max(scrollHeight, minHeight), maxHeight);
   textarea.style.height = `${newHeight}px`;
 }
+
+defineExpose({
+  focus: () => rootRef.value?.focus(),
+});
 </script>
 
 <style scoped>
