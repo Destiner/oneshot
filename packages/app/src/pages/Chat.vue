@@ -37,12 +37,13 @@ function handleNewMessage() {
   store.set('chats', chatsStore.chats);
 }
 
+const chatTitle = computed(() => {
+  return selectedChat.value?.title || 'Chat';
+});
 watch(
-  selectedChat,
-  (newChat) => {
-    if (newChat?.title) {
-      uiStore.setTitle(newChat.title);
-    }
+  chatTitle,
+  (newTitle) => {
+    uiStore.setTitle(newTitle);
   },
   {
     immediate: true,
