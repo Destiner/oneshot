@@ -2,14 +2,13 @@
   <div
     class="chat-messages"
     ref="rootEl"
-    @scroll="handleScroll"
   >
     <TransitionGroup name="list">
       <ChatMessageGroup
         v-for="(group, index) in groupedMessages"
         :key="index"
         :group
-        :is-responding
+        :is-responding="isResponding && index === groupedMessages.length - 1"
       />
     </TransitionGroup>
     <div ref="bottomEl" />
@@ -17,7 +16,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, nextTick, useTemplateRef, ref, watch } from 'vue';
+import { useScroll, whenever } from '@vueuse/core';
+import { computed, ref, useTemplateRef, watch, nextTick } from 'vue';
 
 import type { Message, Model } from '@/stores/chats';
 
@@ -30,34 +30,35 @@ const { messages, isResponding } = defineProps<{
 
 const rootEl = useTemplateRef<HTMLDivElement>('rootEl');
 const bottomEl = useTemplateRef<HTMLDivElement>('bottomEl');
-const isAutoscrolling = ref(false);
-const atBottom = ref(false);
-function handleScroll() {
-  function isAtBottom() {
-    const container = rootEl.value;
-    if (!container) {
-      return false;
-    }
-    return (
-      container.scrollHeight - container.scrollTop - container.clientHeight ===
-      0
-    );
-  }
 
-  if (!isAutoscrolling.value) {
-    atBottom.value = isAtBottom();
-  }
-  isAutoscrolling.value = false;
-}
+const { directions, arrivedState } = useScroll(rootEl);
+const isAtBottom = computed(() => arrivedState.bottom);
+whenever(isAtBottom, () => {
+  isAutoscrolling.value = true;
+});
+whenever(
+  () => directions.top,
+  () => {
+    if (isAtBottom.value) {
+      return;
+    }
+    isAutoscrolling.value = false;
+  },
+);
+whenever(
+  () => isResponding,
+  () => {
+    isAutoscrolling.value = isAtBottom.value;
+  },
+);
+const isAutoscrolling = ref(false);
 async function autoScroll() {
-  if (!atBottom.value) {
+  if (!isAutoscrolling.value) {
     return;
   }
   if (!bottomEl.value) {
     return;
   }
-  isAutoscrolling.value = true;
-  // Wait until the message is rendered
   await nextTick();
   bottomEl.value.scrollIntoView({ behavior: 'smooth' });
 }
