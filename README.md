@@ -5,6 +5,9 @@ Anthropic's MCP client for macOS.
 > [!WARNING]
 > This is an early prototype. Expect the chat history and the tool configuration to be lost with future updates.
 
+<img width="990" alt="Screenshot 2025-01-05 at 15 01 14" src="https://github.com/user-attachments/assets/299840b7-e3c5-484d-8178-c13889a01df8" />
+
+
 ## Features
 
 - Bring your own API key
