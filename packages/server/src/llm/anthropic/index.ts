@@ -194,6 +194,17 @@ async function requestStreamCallback(
   onError: (err: AnthropicError) => void,
   onFinish: (err: Error | null, value: Anthropic.Message) => void,
 ) {
+  if (anthropic.apiKey === '') {
+    const errorMessage = JSON.stringify({
+      type: 'error',
+      error: {
+        message: 'Missing API key',
+        type: 'authentication_error',
+      },
+    });
+    onError(new Error(errorMessage));
+    return;
+  }
   const response = anthropic.messages.stream({
     model,
     max_tokens: 1024,
