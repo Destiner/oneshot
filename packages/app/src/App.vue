@@ -29,6 +29,7 @@ import useChatsStore, { type Chat } from '@/stores/chats';
 import useToolsStore from '@/stores/tools';
 import useProvidersStore from '@/stores/providers';
 import useUiStore from '@/stores/ui';
+import { generateId } from './utils/id';
 
 const { apiBaseUrl } = useEnv();
 const store = useStore();
@@ -87,6 +88,7 @@ const orderedChats = computed(() => {
 const router = useRouter();
 function handleNewChat() {
   chatsStore.chats.push({
+    id: generateId(),
     title: null,
     messages: [],
   });
