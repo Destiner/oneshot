@@ -28,12 +28,6 @@
         <Select.Viewport class="viewport">
           <Select.Group>
             <Select.Item
-              class="item"
-              :value="undefined"
-            >
-              <Select.ItemText> No tool </Select.ItemText>
-            </Select.Item>
-            <Select.Item
               v-for="(tool, index) in availableTools"
               :key="index"
               class="item"
