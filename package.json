@@ -5,6 +5,10 @@
   "workspaces": [
     "packages/*"
   ],
+  "scripts": {
+    "app:dev": "cd packages/app && bun run tauri dev",
+    "server:dev": "cd packages/server && bun run dev"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
