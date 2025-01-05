@@ -59,29 +59,6 @@ interface Tool {
 
 let tools: Tool[] = [
   {
-    id: TOOL_EXA,
-    name: 'Exa',
-    iconUrl: 'https://exa.ai/images/favicon-32x32.png',
-    package: {
-      registry: 'npm',
-      name: 'exa-mcp-server',
-    },
-    args: null,
-    env: {
-      EXA_API_KEY: '',
-    },
-    enabled: true,
-    commands: {
-      search: {
-        description: 'Search the web using Exa AI',
-        actionDescription: {
-          progress: 'Searching web with Exa',
-          done: 'Searched web with Exa',
-        },
-      },
-    },
-  },
-  {
     id: TOOL_SEQUENTIAL_THINKING,
     name: 'Sequential Thinking',
     iconUrl: getStaticPath('icons/thinking.svg'),
@@ -103,6 +80,88 @@ let tools: Tool[] = [
     },
   },
   {
+    id: TOOL_MEMORY_GRAPH,
+    name: 'Memory Graph',
+    iconUrl: getStaticPath('icons/brain.svg'),
+    package: {
+      registry: 'npm',
+      name: '@modelcontextprotocol/server-memory',
+    },
+    args: null,
+    env: {},
+    enabled: true,
+    commands: {
+      create_entities: {
+        description: 'Create multiple new entities in the knowledge graph',
+        actionDescription: {
+          progress: 'Creating entities',
+          done: 'Created entities',
+        },
+      },
+      create_relations: {
+        description:
+          'Create multiple new relations between entities in the knowledge graph. Relations should be in active voice',
+        actionDescription: {
+          progress: 'Creating relations',
+          done: 'Created relations',
+        },
+      },
+      add_observations: {
+        description:
+          'Add new observations to existing entities in the knowledge graph',
+        actionDescription: {
+          progress: 'Adding observations',
+          done: 'Added observations',
+        },
+      },
+      delete_entities: {
+        description:
+          'Delete multiple entities and their associated relations from the knowledge graph',
+        actionDescription: {
+          progress: 'Deleting entities',
+          done: 'Deleted entities',
+        },
+      },
+      delete_observations: {
+        description:
+          'Delete specific observations from entities in the knowledge graph',
+        actionDescription: {
+          progress: 'Deleting observations',
+          done: 'Deleted observations',
+        },
+      },
+      delete_relations: {
+        description: 'Delete multiple relations from the knowledge graph',
+        actionDescription: {
+          progress: 'Deleting relations',
+          done: 'Deleted relations',
+        },
+      },
+      read_graph: {
+        description: 'Read the entire knowledge graph',
+        actionDescription: {
+          progress: 'Reading graph',
+          done: 'Read graph',
+        },
+      },
+      search_nodes: {
+        description: 'Search for nodes in the knowledge graph based on a query',
+        actionDescription: {
+          progress: 'Searching for nodes',
+          done: 'Searched for nodes',
+        },
+      },
+      open_nodes: {
+        description:
+          'Open specific nodes in the knowledge graph by their names',
+        actionDescription: {
+          progress: 'Opening nodes',
+          done: 'Opened nodes',
+        },
+      },
+    },
+  },
+  {
     id: TOOL_FILE_SYSTEM,
     name: 'File System',
     iconUrl: getStaticPath('icons/finder.png'),
@@ -110,9 +169,9 @@ let tools: Tool[] = [
       registry: 'npm',
       name: '@modelcontextprotocol/server-filesystem',
     },
-    args: ['/Users/destiner/Desktop', '/Users/destiner/Downloads'],
+    args: ['/Users/YOUR_NAME/Desktop', '/Users/YOUR_NAME/Downloads'],
     env: {},
-    enabled: true,
+    enabled: false,
     commands: {
       read_file: {
         description:
@@ -189,6 +248,59 @@ let tools: Tool[] = [
     },
   },
   {
+    id: TOOL_EXA,
+    name: 'Exa',
+    iconUrl: 'https://exa.ai/images/favicon-32x32.png',
+    package: {
+      registry: 'npm',
+      name: 'exa-mcp-server',
+    },
+    args: null,
+    env: {
+      EXA_API_KEY: '',
+    },
+    enabled: false,
+    commands: {
+      search: {
+        description: 'Search the web using Exa AI',
+        actionDescription: {
+          progress: 'Searching web with Exa',
+          done: 'Searched web with Exa',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_OBSIDIAN,
+    name: 'Obsidian',
+    iconUrl: 'https://obsidian.md/favicon.ico',
+    package: {
+      registry: 'npm',
+      name: 'mcp-obsidian',
+    },
+    args: ['path/to/vault'],
+    env: {},
+    enabled: false,
+    commands: {
+      read_notes: {
+        description:
+          "Read the contents of multiple notes. Each note's content is returned with its path as a reference. Failed reads for individual notes won't stop the entire operation. Reading too many at once may result in an error.",
+        actionDescription: {
+          progress: 'Reading notes',
+          done: 'Read notes',
+        },
+      },
+      search_notes: {
+        description:
+          'Searches for a note by its name. The search is case-insensitive and matches partial names. Queries can also be a valid regex. Returns paths of the notes that match the query.',
+        actionDescription: {
+          progress: 'Searching for notes',
+          done: 'Searched for notes',
+        },
+      },
+    },
+  },
+  {
     id: TOOL_LINEAR,
     name: 'Linear',
     iconUrl: 'https://linear.app/favicon.ico',
@@ -200,7 +312,7 @@ let tools: Tool[] = [
     env: {
       LINEAR_API_KEY: '',
     },
-    enabled: true,
+    enabled: false,
     commands: {
       create_issue: {
         description:
@@ -256,7 +368,7 @@ let tools: Tool[] = [
     env: {
       E2B_API_KEY: '',
     },
-    enabled: true,
+    enabled: false,
     commands: {
       run_code: {
         description:
@@ -264,36 +376,6 @@ let tools: Tool[] = [
         actionDescription: {
           progress: 'Running Python code',
           done: 'Ran Python code',
-        },
-      },
-    },
-  },
-  {
-    id: TOOL_OBSIDIAN,
-    name: 'Obsidian',
-    iconUrl: 'https://obsidian.md/favicon.ico',
-    package: {
-      registry: 'npm',
-      name: 'mcp-obsidian',
-    },
-    args: [],
-    env: {},
-    enabled: false,
-    commands: {
-      read_notes: {
-        description:
-          "Read the contents of multiple notes. Each note's content is returned with its path as a reference. Failed reads for individual notes won't stop the entire operation. Reading too many at once may result in an error.",
-        actionDescription: {
-          progress: 'Reading notes',
-          done: 'Read notes',
-        },
-      },
-      search_notes: {
-        description:
-          'Searches for a note by its name. The search is case-insensitive and matches partial names. Queries can also be a valid regex. Returns paths of the notes that match the query.',
-        actionDescription: {
-          progress: 'Searching for notes',
-          done: 'Searched for notes',
         },
       },
     },
@@ -492,88 +574,6 @@ let tools: Tool[] = [
     },
   },
   {
-    id: TOOL_MEMORY_GRAPH,
-    name: 'Memory Graph',
-    iconUrl: getStaticPath('icons/brain.svg'),
-    package: {
-      registry: 'npm',
-      name: '@modelcontextprotocol/server-memory',
-    },
-    args: null,
-    env: {},
-    enabled: false,
-    commands: {
-      create_entities: {
-        description: 'Create multiple new entities in the knowledge graph',
-        actionDescription: {
-          progress: 'Creating entities',
-          done: 'Created entities',
-        },
-      },
-      create_relations: {
-        description:
-          'Create multiple new relations between entities in the knowledge graph. Relations should be in active voice',
-        actionDescription: {
-          progress: 'Creating relations',
-          done: 'Created relations',
-        },
-      },
-      add_observations: {
-        description:
-          'Add new observations to existing entities in the knowledge graph',
-        actionDescription: {
-          progress: 'Adding observations',
-          done: 'Added observations',
-        },
-      },
-      delete_entities: {
-        description:
-          'Delete multiple entities and their associated relations from the knowledge graph',
-        actionDescription: {
-          progress: 'Deleting entities',
-          done: 'Deleted entities',
-        },
-      },
-      delete_observations: {
-        description:
-          'Delete specific observations from entities in the knowledge graph',
-        actionDescription: {
-          progress: 'Deleting observations',
-          done: 'Deleted observations',
-        },
-      },
-      delete_relations: {
-        description: 'Delete multiple relations from the knowledge graph',
-        actionDescription: {
-          progress: 'Deleting relations',
-          done: 'Deleted relations',
-        },
-      },
-      read_graph: {
-        description: 'Read the entire knowledge graph',
-        actionDescription: {
-          progress: 'Reading graph',
-          done: 'Read graph',
-        },
-      },
-      search_nodes: {
-        description: 'Search for nodes in the knowledge graph based on a query',
-        actionDescription: {
-          progress: 'Searching for nodes',
-          done: 'Searched for nodes',
-        },
-      },
-      open_nodes: {
-        description:
-          'Open specific nodes in the knowledge graph by their names',
-        actionDescription: {
-          progress: 'Opening nodes',
-          done: 'Opened nodes',
-        },
-      },
-    },
-  },
-  {
     id: TOOL_GOOGLE_MAPS,
     name: 'Google Maps',
     iconUrl:
@@ -642,7 +642,7 @@ let tools: Tool[] = [
   },
   {
     id: TOOL_DATETIME,
-    name: 'DateTime',
+    name: 'Date & Time',
     iconUrl: getStaticPath('icons/clock.svg'),
     package: {
       registry: 'pypi',
@@ -650,7 +650,7 @@ let tools: Tool[] = [
     },
     args: null,
     env: {},
-    enabled: false,
+    enabled: true,
     commands: {
       ['get-current-time']: {
         description: 'Get the current time in the configured local timezone',
@@ -671,7 +671,7 @@ let tools: Tool[] = [
     },
     args: null,
     env: {},
-    enabled: false,
+    enabled: true,
     commands: {
       fetch: {
         description: 'Fetch a URL',
@@ -769,7 +769,7 @@ let tools: Tool[] = [
     },
     args: null,
     env: {},
-    enabled: false,
+    enabled: true,
     commands: {
       get_stories: {
         description:
