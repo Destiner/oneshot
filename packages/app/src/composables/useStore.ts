@@ -5,7 +5,7 @@ interface UseStore {
   set(key: string, value: unknown): Promise<void>;
 }
 
-const VERSION = 1;
+const VERSION = 3;
 
 function useStore(): UseStore {
   const filename = `store-${VERSION}.json`;
