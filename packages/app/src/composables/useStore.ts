@@ -5,14 +5,18 @@ interface UseStore {
   set(key: string, value: unknown): Promise<void>;
 }
 
+const VERSION = 1;
+
 function useStore(): UseStore {
+  const filename = `store-${VERSION}.json`;
+
   async function get<T>(key: string) {
-    const store = await load('store.json', { autoSave: false });
+    const store = await load(filename, { autoSave: false });
     return store.get<T>(key);
   }
 
   async function set(key: string, value: unknown) {
-    const store = await load('store.json', { autoSave: false });
+    const store = await load(filename, { autoSave: false });
     await store.set(key, value);
   }
 

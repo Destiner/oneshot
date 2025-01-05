@@ -33,11 +33,23 @@ async function reconnect() {
     if (!tool.enabled) {
       continue;
     }
-    const args = tool.args || [];
+    const args = tool.args
+      ? [tool.package.name, ...tool.args]
+      : [tool.package.name];
+    const command =
+      tool.package.registry === 'npm'
+        ? 'bunx'
+        : tool.package.registry === 'pypi'
+          ? 'uvx'
+          : '';
+    console.log(command, args, tool.env);
     const client = new StdioClientTransport({
-      command: 'bunx',
-      args: [tool.package, ...args],
-      env: tool.env,
+      command,
+      args,
+      env: {
+        ...tool.env,
+        PATH: process.env.PATH || '',
+      },
     });
     clients[tool.id] = client;
   }

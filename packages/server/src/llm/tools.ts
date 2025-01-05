@@ -11,6 +11,11 @@ const TOOL_YOUTUBE_TRANSCRIPT = 'youtubeTranscript';
 const TOOL_GITHUB = 'github';
 const TOOL_MEMORY_GRAPH = 'memoryGraph';
 const TOOL_GOOGLE_MAPS = 'googleMaps';
+const TOOL_DATETIME = 'datetime';
+const TOOL_FETCH = 'fetch';
+const TOOL_ARXIV = 'arxiv';
+const TOOL_PUBMED = 'pubmed';
+const TOOL_HACKER_NEWS = 'hackerNews';
 
 type ToolId =
   | typeof TOOL_EXA
@@ -23,7 +28,12 @@ type ToolId =
   | typeof TOOL_YOUTUBE_TRANSCRIPT
   | typeof TOOL_GITHUB
   | typeof TOOL_MEMORY_GRAPH
-  | typeof TOOL_GOOGLE_MAPS;
+  | typeof TOOL_GOOGLE_MAPS
+  | typeof TOOL_DATETIME
+  | typeof TOOL_FETCH
+  | typeof TOOL_ARXIV
+  | typeof TOOL_PUBMED
+  | typeof TOOL_HACKER_NEWS;
 
 interface Command {
   description: string;
@@ -37,7 +47,10 @@ interface Tool {
   id: ToolId;
   name: string;
   iconUrl: string;
-  package: string;
+  package: {
+    registry: 'npm' | 'pypi';
+    name: string;
+  };
   args: string[] | null;
   env: Record<string, string>;
   enabled: boolean;
@@ -49,7 +62,10 @@ let tools: Tool[] = [
     id: TOOL_EXA,
     name: 'Exa',
     iconUrl: 'https://exa.ai/images/favicon-32x32.png',
-    package: 'exa-mcp-server',
+    package: {
+      registry: 'npm',
+      name: 'exa-mcp-server',
+    },
     args: null,
     env: {
       EXA_API_KEY: '',
@@ -69,7 +85,10 @@ let tools: Tool[] = [
     id: TOOL_SEQUENTIAL_THINKING,
     name: 'Sequential Thinking',
     iconUrl: getStaticPath('icons/thinking.svg'),
-    package: '@modelcontextprotocol/server-sequential-thinking',
+    package: {
+      registry: 'npm',
+      name: '@modelcontextprotocol/server-sequential-thinking',
+    },
     args: null,
     env: {},
     enabled: true,
@@ -87,7 +106,10 @@ let tools: Tool[] = [
     id: TOOL_FILE_SYSTEM,
     name: 'File System',
     iconUrl: getStaticPath('icons/finder.png'),
-    package: '@modelcontextprotocol/server-filesystem',
+    package: {
+      registry: 'npm',
+      name: '@modelcontextprotocol/server-filesystem',
+    },
     args: ['/Users/destiner/Desktop', '/Users/destiner/Downloads'],
     env: {},
     enabled: true,
@@ -170,7 +192,10 @@ let tools: Tool[] = [
     id: TOOL_LINEAR,
     name: 'Linear',
     iconUrl: 'https://linear.app/favicon.ico',
-    package: 'mcp-linear',
+    package: {
+      registry: 'npm',
+      name: 'mcp-linear',
+    },
     args: null,
     env: {
       LINEAR_API_KEY: '',
@@ -223,7 +248,10 @@ let tools: Tool[] = [
     id: TOOL_E2B,
     name: 'E2B',
     iconUrl: 'https://e2b.dev/favicon.ico',
-    package: '@e2b/mcp-server',
+    package: {
+      registry: 'npm',
+      name: '@e2b/mcp-server',
+    },
     args: null,
     env: {
       E2B_API_KEY: '',
@@ -244,7 +272,10 @@ let tools: Tool[] = [
     id: TOOL_OBSIDIAN,
     name: 'Obsidian',
     iconUrl: 'https://obsidian.md/favicon.ico',
-    package: 'mcp-obsidian',
+    package: {
+      registry: 'npm',
+      name: 'mcp-obsidian',
+    },
     args: [],
     env: {},
     enabled: false,
@@ -271,7 +302,10 @@ let tools: Tool[] = [
     id: TOOL_BRAVE_SEARCH,
     name: 'Brave Search',
     iconUrl: 'https://brave.com/favicon.ico',
-    package: '@modelcontextprotocol/server-brave-search',
+    package: {
+      registry: 'npm',
+      name: '@modelcontextprotocol/server-brave-search',
+    },
     args: null,
     env: {
       BRAVE_API_KEY: '',
@@ -300,7 +334,10 @@ let tools: Tool[] = [
     id: TOOL_YOUTUBE_TRANSCRIPT,
     name: 'YouTube Transcript',
     iconUrl: 'https://www.youtube.com/favicon.ico',
-    package: '@kimtaeyoon83/mcp-server-youtube-transcript',
+    package: {
+      registry: 'npm',
+      name: '@kimtaeyoon83/mcp-server-youtube-transcript',
+    },
     args: null,
     env: {},
     enabled: false,
@@ -318,7 +355,10 @@ let tools: Tool[] = [
     id: TOOL_GITHUB,
     name: 'GitHub',
     iconUrl: 'https://github.com/favicon.ico',
-    package: '@modelcontextprotocol/server-github',
+    package: {
+      registry: 'npm',
+      name: '@modelcontextprotocol/server-github',
+    },
     args: null,
     env: {
       GITHUB_PERSONAL_ACCESS_TOKEN: '',
@@ -455,7 +495,10 @@ let tools: Tool[] = [
     id: TOOL_MEMORY_GRAPH,
     name: 'Memory Graph',
     iconUrl: getStaticPath('icons/brain.svg'),
-    package: '@modelcontextprotocol/server-memory',
+    package: {
+      registry: 'npm',
+      name: '@modelcontextprotocol/server-memory',
+    },
     args: null,
     env: {},
     enabled: false,
@@ -535,7 +578,10 @@ let tools: Tool[] = [
     name: 'Google Maps',
     iconUrl:
       'https://maps.gstatic.com/mapfiles/maps_lite/pwa/icons/maps15_bnuw3a_round_192x192.png',
-    package: '@modelcontextprotocol/server-google-maps',
+    package: {
+      registry: 'npm',
+      name: '@modelcontextprotocol/server-google-maps',
+    },
     args: null,
     env: {
       GOOGLE_MAPS_API_KEY: '',
@@ -590,6 +636,171 @@ let tools: Tool[] = [
         actionDescription: {
           progress: 'Getting directions',
           done: 'Got directions',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_DATETIME,
+    name: 'DateTime',
+    iconUrl: getStaticPath('icons/clock.svg'),
+    package: {
+      registry: 'pypi',
+      name: 'MCP-timeserver',
+    },
+    args: null,
+    env: {},
+    enabled: false,
+    commands: {
+      ['get-current-time']: {
+        description: 'Get the current time in the configured local timezone',
+        actionDescription: {
+          progress: 'Getting current time',
+          done: 'Got current time',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_FETCH,
+    name: 'Fetch',
+    iconUrl: getStaticPath('icons/network.svg'),
+    package: {
+      registry: 'pypi',
+      name: 'mcp-server-fetch',
+    },
+    args: null,
+    env: {},
+    enabled: false,
+    commands: {
+      fetch: {
+        description: 'Fetch a URL',
+        actionDescription: {
+          progress: 'Fetching URL',
+          done: 'Fetched URL',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_ARXIV,
+    name: 'arXiv',
+    iconUrl: 'https://arxiv.org/favicon.ico',
+    package: {
+      registry: 'pypi',
+      name: 'mcp-simple-arxiv',
+    },
+    args: null,
+    env: {},
+    enabled: false,
+    commands: {
+      search_papers: {
+        description: 'Search for papers on arXiv by title and abstract content',
+        actionDescription: {
+          progress: 'Searching for papers',
+          done: 'Searched for papers',
+        },
+      },
+      get_paper_data: {
+        description: 'Get detailed information about a specific paper',
+        actionDescription: {
+          progress: 'Getting paper data',
+          done: 'Got paper data',
+        },
+      },
+      list_categories: {
+        description:
+          'List all available arXiv categories and how to use them in search',
+        actionDescription: {
+          progress: 'Requesting categories',
+          done: 'Requested categories',
+        },
+      },
+      update_categories: {
+        description:
+          'Update the stored category taxonomy by fetching the latest version from arxiv.org',
+        actionDescription: {
+          progress: 'Updating categories',
+          done: 'Updated categories',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_PUBMED,
+    name: 'PubMed',
+    iconUrl:
+      'https://cdn.ncbi.nlm.nih.gov/coreutils/nwds/img/favicons/favicon.ico',
+    package: {
+      registry: 'pypi',
+      name: 'mcp-server-pubmed',
+    },
+    args: null,
+    env: {
+      PUBMED_EMAIL: '',
+      PUBMED_API_KEY: '',
+    },
+    enabled: false,
+    commands: {
+      search_pubmed: {
+        description:
+          'Search PubMed for medical and life sciences research articles',
+        actionDescription: {
+          progress: 'Searching for papers',
+          done: 'Searched for papers',
+        },
+      },
+      get_paper_fulltext: {
+        description: 'Get full text of a PubMed article using its ID',
+        actionDescription: {
+          progress: 'Getting paper text',
+          done: 'Got paper text',
+        },
+      },
+    },
+  },
+  {
+    id: TOOL_HACKER_NEWS,
+    name: 'Hacker News',
+    iconUrl: 'https://news.ycombinator.com/favicon.ico',
+    package: {
+      registry: 'pypi',
+      name: 'mcp-hn',
+    },
+    args: null,
+    env: {},
+    enabled: false,
+    commands: {
+      get_stories: {
+        description:
+          "Get stories from Hacker News. The options are `top`, `new`, `ask_hn`, `show_hn` for types of stories. This doesn't include the comments. Use `get_story_info` to get the comments.",
+        actionDescription: {
+          progress: 'Getting stories',
+          done: 'Got stories',
+        },
+      },
+      get_user_info: {
+        description:
+          "Get user info from Hacker News, including the stories they've submitted",
+        actionDescription: {
+          progress: 'Getting user info',
+          done: 'Got user info',
+        },
+      },
+      search_stories: {
+        description:
+          'Search stories from Hacker News. It is generally recommended to use simpler queries to get a broader set of results (less than 5 words). Very targetted queries may not return any results.',
+        actionDescription: {
+          progress: 'Searching for stories',
+          done: 'Searched for stories',
+        },
+      },
+      get_story_info: {
+        description:
+          'Get detailed story info from Hacker News, including the comments',
+        actionDescription: {
+          progress: 'Getting story info',
+          done: 'Got story info',
         },
       },
     },

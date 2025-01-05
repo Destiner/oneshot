@@ -36,7 +36,10 @@ interface Tool {
   id: ToolId;
   name: string;
   iconUrl: string;
-  package: string;
+  package: {
+    registry: 'npm' | 'pypi';
+    name: string;
+  };
   args: string[] | null;
   env: Record<string, string>;
   enabled: boolean;
