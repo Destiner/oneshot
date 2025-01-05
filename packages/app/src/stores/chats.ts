@@ -12,6 +12,7 @@ interface TextContent {
 interface ToolContent {
   type: 'tool';
   toolId: ToolId;
+  toolUseId: string;
   commandId: string;
   input: string;
   output?: string;

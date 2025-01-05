@@ -192,6 +192,7 @@ async function request(tools: ToolId[]) {
             ? ({
                 type: 'tool',
                 toolId: getToolId(newContentBlock.name),
+                toolUseId: newContentBlock.id,
                 commandId: getCommandId(newContentBlock.name),
                 input: '',
               } as ToolContent)
@@ -217,14 +218,22 @@ async function request(tools: ToolId[]) {
           }
         }
       } else if (event.type === 'tool_result') {
-        const latestMessage = chat.messages[chat.messages.length - 1];
-        if (!latestMessage) return;
-        const latestContentBlock =
-          latestMessage.content[latestMessage.content.length - 1];
-        if (!latestContentBlock) return;
-        if (latestContentBlock.type === 'tool') {
-          latestContentBlock.output = event.result;
+        // Find content block by tool_use_id
+        const toolUseId = event.toolUseId;
+        const toolUseContentBlock = chat.messages
+          .map((message) => message.content)
+          .flat()
+          .find(
+            (content) =>
+              content.type === 'tool' && content.toolUseId === toolUseId,
+          );
+        if (!toolUseContentBlock) {
+          return;
         }
+        if (toolUseContentBlock.type !== 'tool') {
+          return;
+        }
+        toolUseContentBlock.output = event.result;
       } else if (event.type === 'error') {
         chat.messages.push({
           role: 'assistant',
