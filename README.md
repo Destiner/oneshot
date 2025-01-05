@@ -20,7 +20,7 @@ bun install
 ```
 
 > [!NOTE]
-> You also need `bun` and Python's `uv` installed locally. Later versions of the app will bundle those dependencies.
+> You also need `bun` and Python's `uv` installed locally. Later versions of the app will bundle those dependencies automatically.
 
 To run:
 
@@ -35,5 +35,3 @@ bun run server:dev
 ```bash
 bun run app:dev
 ```
-
-This project was created using `bun init` in bun v1.1.34. [Bun](https://bun.sh) is a fast all-in-one JavaScript runtime.
