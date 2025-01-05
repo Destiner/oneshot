@@ -78,7 +78,24 @@ onMounted(() => {
   if (textareaRef.value) {
     textareaRef.value.focus();
   }
+  setTool();
 });
+
+function setTool() {
+  // Select the latest used tool (if any)
+  const reversedMessages = [...chat.messages].reverse();
+  for (const message of reversedMessages) {
+    if (message.content.length > 0) {
+      const reversedContent = [...message.content].reverse();
+      for (const content of reversedContent) {
+        if (content.type === 'tool') {
+          selectedToolId.value = content.toolId;
+          return;
+        }
+      }
+    }
+  }
+}
 
 function convertMessages(messages: Message[]): Anthropic.MessageParam[] {
   function generateToolUseId() {
