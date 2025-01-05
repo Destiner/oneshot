@@ -37,7 +37,7 @@ const chatsStore = useChatsStore();
 const providersStore = useProvidersStore();
 const toolsStore = useToolsStore();
 const uiStore = useUiStore();
-const withSidebar = ref(false);
+const withSidebar = ref(true);
 
 const title = computed(() => uiStore.title);
 const chats = computed(() => chatsStore.chats);
